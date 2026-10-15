@@ -30,7 +30,6 @@
             box-sizing: border-box;
         }
 
-        /* 1. Animated Progress Bar */
         .progress-container {
             width: 100%;
             height: 16px;
@@ -45,7 +44,6 @@
             height: 100%;
             background: var(--primary);
             width: 0%;
-            /* อนิเมชันหลอดเลือดวิ่ง */
             transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             border-radius: 10px;
             position: relative;
@@ -82,6 +80,7 @@
             font-weight: bold;
             transition: transform 0.1s;
         }
+        .audio-btn:hover { background: #149edb; }
         .audio-btn:active { border-bottom: 0px; transform: translateY(4px); }
 
         .options { display: flex; flex-direction: column; gap: 12px; }
@@ -131,7 +130,6 @@
             transform: scale(1.05);
         }
         
-        /* อนิเมชันตอนจับคู่ถูก (Pop & Disappear) */
         .match-item.matched {
             animation: popOut 0.4s forwards;
             pointer-events: none;
@@ -142,7 +140,6 @@
             100% { transform: scale(0); opacity: 0; }
         }
 
-        /* อนิเมชันตอนจับคู่ผิด (สั่นแรงๆ) */
         .match-item.shake {
             animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
             border-color: var(--danger);
@@ -173,7 +170,6 @@
         .next-btn { background: #1cb0f6; border-bottom: 4px solid #1899d6; display: none; }
         .next-btn:active { border-bottom: 0px; transform: translateY(4px); }
 
-        /* เอฟเฟกต์ตอบกลับเด้งดึ๋ง (Juicy Feedback) */
         .feedback {
             margin-top: 20px;
             padding: 20px;
@@ -198,11 +194,7 @@
         .feedback.correct { background: #d7ffb8; color: #46a302; border: 2px solid #b8f28b; }
         .feedback.wrong { background: #ffdfe0; color: #ea2b2b; border: 2px solid #ffb3b8; }
         
-        .feedback-icon {
-            font-size: 2rem;
-            margin-bottom: 5px;
-            display: block;
-        }
+        .feedback-icon { font-size: 2rem; margin-bottom: 5px; display: block; }
     </style>
 </head>
 <body>
@@ -215,7 +207,7 @@
 
         <div class="question-box">
             <div class="question-text" id="question-text">คำถามจะแสดงตรงนี้</div>
-            <button id="audio-btn" class="audio-btn" onclick="playQuestionAudio()" style="display: none;">🔊 ฟังเสียง</button>
+            <button id="audio-btn" class="audio-btn" onclick="playQuestionAudio()" style="display: none;">🔊 ฟังเสียงอีกครั้ง</button>
             <div id="interactive-area"></div>
         </div>
 
@@ -257,7 +249,12 @@ for (let i = 0; i < dictionary.length; i += 4) {
 dictionary.forEach(word => {
     let wrongTh = dictionary.filter(d => d.t !== word.t).sort(() => 0.5 - Math.random()).map(d => d.t).slice(0, 3);
     wrongTh.push(word.t);
+    
+    // โจทย์อ่านและแปล
     allQuestions.push({ id: 'vocab_ja_th_' + idCounter++, type: 'choice', q: `คำแปลของ "${word.j}" คือข้อใด?`, options: wrongTh.sort(() => 0.5 - Math.random()), ans: word.t, ja: word.j, th: word.t });
+    
+    // โจทย์ฟังเสียง
+    allQuestions.push({ id: 'listen_' + idCounter++, type: 'listening', q: '🔊 ฟังเสียงแล้วเลือกคำแปลที่ตรงกัน', audioText: word.j, options: wrongTh.sort(() => 0.5 - Math.random()), ans: word.t, ja: word.j, th: word.t });
 });
 
 function getMistakeStats() { return JSON.parse(localStorage.getItem('spacedRepetitionStats') || '{}'); }
@@ -279,6 +276,24 @@ let userSelection = null;
 let matchPairsLeft = 0;
 let selectedMatchBtn = null;
 
+// ฟังก์ชันอ่านออกเสียง (TTS) เพิ่มใหม่ตรงนี้ครับ
+function playQuestionAudio() {
+    const q = currentSessionQs[currentIndex];
+    const textToSpeak = q.audioText || q.ja;
+    
+    if (textToSpeak && 'speechSynthesis' in window) {
+        // ยกเลิกเสียงเก่าที่อาจจะค้างอยู่
+        window.speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        utterance.lang = 'ja-JP'; // ตั้งค่าเป็นเสียงภาษาญี่ปุ่น
+        utterance.rate = 0.85;    // ปรับให้พูดช้าลงเล็กน้อย (1.0 คือปกติ)
+        window.speechSynthesis.speak(utterance);
+    } else {
+        console.log("เบราว์เซอร์นี้ไม่รองรับระบบอ่านออกเสียง");
+    }
+}
+
 function startSession() {
     currentSessionQs = selectQuestionsForSession(10);
     currentIndex = 0;
@@ -297,13 +312,22 @@ function showQuestion() {
     const area = document.getElementById('interactive-area');
     area.innerHTML = '';
     
-    // รีเซ็ตแอนิเมชันเฉลย
     const fb = document.getElementById('feedback');
     fb.classList.remove('show', 'correct', 'wrong');
     fb.style.display = 'none';
     
     document.getElementById('check-btn').style.display = (q.type === 'matching') ? 'none' : 'block';
     document.getElementById('next-btn').style.display = 'none';
+    
+    // จัดการปุ่มฟังเสียง
+    const audioBtn = document.getElementById('audio-btn');
+    if (q.type === 'listening') {
+        audioBtn.style.display = 'block';
+        setTimeout(playQuestionAudio, 300); // ดีเลย์นิดนึงแล้วเล่นเสียงอัตโนมัติ
+    } else {
+        audioBtn.style.display = 'none';
+    }
+
     userSelection = null;
 
     if (q.type === 'choice' || q.type === 'listening') {
@@ -356,6 +380,15 @@ function handleMatchClick(btn) {
     if (!selectedMatchBtn) {
         btn.classList.add('selected');
         selectedMatchBtn = btn;
+        
+        // แถมลูกเล่น: ถ้ากดปุ่มฝั่งญี่ปุ่น ให้อ่านออกเสียงคำนั้นด้วย
+        if (btn.dataset.lang === 'ja' && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(btn.innerText);
+            utterance.lang = 'ja-JP';
+            window.speechSynthesis.speak(utterance);
+        }
+
     } else {
         if (selectedMatchBtn.dataset.lang !== btn.dataset.lang && selectedMatchBtn.dataset.id === btn.dataset.id) {
             btn.classList.add('matched');
@@ -399,9 +432,7 @@ function checkAnswer() {
 
 function showFeedback(isCorrect, text, emoji) {
     const fb = document.getElementById('feedback');
-    fb.classList.remove('show', 'correct', 'wrong'); // ล้างแอนิเมชันเดิมออกก่อน
-    
-    // บังคับให้เบราว์เซอร์รีเฟรช DOM เพื่อให้แอนิเมชันเล่นซ้ำได้
+    fb.classList.remove('show', 'correct', 'wrong');
     void fb.offsetWidth; 
     
     document.getElementById('feedback-icon').innerText = emoji;
