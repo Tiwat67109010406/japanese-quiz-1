@@ -1,339 +1,450 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>แบบประเมินรูปแบบการจัดการความขัดแย้ง (TKI) - สำหรับงานกลุ่ม</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
---bg:#f6f5fb;--card:#fff;--tx:#1f1d2b;--mut:#6b6880;--bd:#dedbed;--ac:#6d4fd6;--acs:#ece8fb;--ok:#1d9a6c;--warn:#e63946}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15141c;--card:#1f1e2a;--tx:#ecebf5;--mut:#a09db5;--bd:#34324a;--ac:#9a84f0;--acs:#2b2842;--ok:#4cc79a;--warn:#ff6b6b}}
-*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--tx);font-family:"Noto Sans Thai","Sarabun",system-ui,sans-serif;line-height:1.6}
-.w{max-width:720px;margin:0 auto;padding:20px 16px 48px}
-h1{font-size:1.4rem;margin:8px 0; color:var(--ac)}
-h2{font-size:1.2rem;margin-top:0}
-.mut{color:var(--mut);font-size:.92rem}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin:14px 0;box-shadow:0 2px 8px rgba(0,0,0,0.02)}
-.q{font-weight:600;margin-bottom:8px; font-size: 1.05rem}
-label.o{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--bd);border-radius:10px;margin:8px 0;cursor:pointer;transition:all 0.2s}
-label.o:has(input:checked){background:var(--acs);border-color:var(--ac)}
-input[type=radio]{margin-top:4px;accent-color:var(--ac);transform:scale(1.2)}
-input[type=text], select{font:inherit;width:100%;padding:12px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);margin-bottom:12px}
-input[type=text]:focus, select:focus{outline:none;border-color:var(--ac)}
-.bar{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:8px 0;z-index:5;border-bottom:1px solid var(--bd)}
-.pg{height:8px;background:var(--bd);border-radius:6px;overflow:hidden}.pg i{display:block;height:100%;width:0;background:var(--ac);transition:width .3s}
-button{font:inherit;font-weight:600;border:0;border-radius:10px;padding:12px 20px;background:var(--ac);color:#fff;cursor:pointer;margin:4px 6px 4px 0;transition:opacity 0.2s}
-button:hover{opacity:0.9}
-button.s{background:var(--bd);color:var(--tx)}
-button.danger{background:var(--warn);color:#fff}
-button.warning{background:#f39c12;color:#fff}
-button.del-btn{background:rgba(230,57,70,0.1);color:var(--warn);padding:4px 10px;font-size:0.8rem;border-radius:6px;}
-button.del-btn:hover{background:var(--warn);color:#fff;}
-.r{margin:10px 0}.r b{display:flex;justify-content:space-between}.r .t{height:14px;background:var(--bd);border-radius:7px;overflow:hidden}.r .t i{display:block;height:100%;background:var(--ac)}
-.r.top .t i{background:var(--ok)}
-#res, #adminPanel{display:none}
-.err{color:var(--warn);font-weight:600;display:none;background:#ffe5e5;padding:10px;border-radius:8px;margin-bottom:14px}
-@media (prefers-color-scheme:dark){.err{background:#3a1c1c}}
-.admin-section{margin-top:60px;padding-top:20px;border-top:2px dashed var(--bd);text-align:center}
-.acc-header {display: flex;justify-content: space-between;align-items: center;cursor: pointer;padding: 12px 16px;background: var(--acs);border-radius: 10px;user-select: none;}
-.acc-header:hover { opacity: 0.95; }
-.acc-body { display: none; padding-top: 14px; }
-.acc-body.open { display: block; }
-.badge {display: inline-block;padding: 2px 8px;border-radius: 6px;font-size: 0.8rem;font-weight: bold;margin-right: 6px;}
-.badge-pre {background: #e1f0ff;color: #1d72b8;border: 1px solid #b3d7ff;}
-.badge-post {background: #e6f9f0;color: #1d9a6c;border: 1px solid #a3e6cb;}
-@media (prefers-color-scheme:dark){
-  .badge-pre { background: #1c334a; color: #72b6ff; border-color: #2b4c6f; }
-  .badge-post { background: #1c3b30; color: #62e3b1; border-color: #285a48; }
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Japanese Learning Quiz</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --correct: #22c55e;
+      --incorrect: #ef4444;
+      --tile-bg: #334155;
+      --tile-selected: #475569;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .quiz-container {
+      background-color: var(--card-bg);
+      width: 100%;
+      max-width: 600px;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #334155;
+      padding-bottom: 12px;
+    }
+
+    .progress {
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    .score {
+      font-weight: bold;
+      color: var(--correct);
+    }
+
+    .question-box {
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    .question-text {
+      font-size: 1.4rem;
+      margin-bottom: 12px;
+    }
+
+    .audio-btn {
+      background-color: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.1s, background-color 0.2s;
+    }
+
+    .audio-btn:active {
+      transform: scale(0.95);
+    }
+
+    .answer-slot {
+      min-height: 60px;
+      background-color: #0f172a;
+      border: 2px dashed #475569;
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+
+    .tiles-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+
+    .tile {
+      background-color: var(--tile-bg);
+      color: var(--text-main);
+      padding: 12px 18px;
+      font-size: 1.2rem;
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.2s, transform 0.1s;
+      border: 1px solid #475569;
+    }
+
+    .tile:hover {
+      background-color: var(--tile-selected);
+    }
+
+    .tile:active {
+      transform: scale(0.96);
+    }
+
+    .choices-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .choice-btn {
+      background-color: var(--tile-bg);
+      color: var(--text-main);
+      border: 1px solid #475569;
+      padding: 16px;
+      font-size: 1.2rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .choice-btn:hover {
+      background-color: var(--tile-selected);
+    }
+
+    .choice-btn:active {
+      transform: scale(0.98);
+    }
+
+    .action-btn {
+      background-color: var(--accent);
+      color: #0f172a;
+      border: none;
+      padding: 14px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+      transition: background-color 0.2s;
+    }
+
+    .action-btn:hover {
+      background-color: var(--accent-hover);
+      color: #fff;
+    }
+
+    .feedback {
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: bold;
+      min-height: 24px;
+    }
+
+    .feedback.correct {
+      color: var(--correct);
+    }
+
+    .feedback.incorrect {
+      color: var(--incorrect);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
 </head>
 <body>
-<div class="w">
-<h1>แบบประเมิน TKI: การจัดการความขัดแย้งในงานกลุ่ม</h1>
-<p class="mut">ประยุกต์จาก Thomas-Kilmann Conflict Mode Instrument (TKI) เพื่อใช้วัดผลก่อนและหลังการทำโครงการ Daily Conflict Clear</p>
 
-<!-- 1. ข้อมูลผู้ประเมิน -->
-<div class="card" id="infoCard" style="border:2px solid var(--ac)">
-  <h2>📋 ข้อมูลผู้ประเมิน</h2>
-  <label style="display:block;margin-bottom:6px;font-weight:600;margin-top:10px;">ชื่อ-นามสกุล <span style="color:var(--warn)">*</span></label>
-  <input type="text" id="uname" placeholder="เช่น นายสมชาย ใจดี" required>
-  <label style="display:block;margin-bottom:6px;font-weight:600;">รหัสนิสิต (11 หลัก) <span style="color:var(--warn)">*</span></label>
-  <input type="text" id="uid" placeholder="กรอกตัวเลข 11 หลัก เช่น 67XXXXXXXXX" maxlength="11" required>
-  <label style="display:block;margin-bottom:6px;font-weight:600;">ระยะเวลาการทำประเมิน <span style="color:var(--warn)">*</span></label>
-  <select id="when">
-    <option value="Pre-test (ก่อนทำโครงการ)">Pre-test (ก่อนทำโครงการ)</option>
-    <option value="Post-test (หลังทำโครงการ)">Post-test (หลังทำโครงการ)</option>
-  </select>
-</div>
-
-<!-- Progress Bar -->
-<div class="bar"><div class="pg"><i id="pg"></i></div><div class="mut" id="cnt" style="margin-top:6px;font-weight:600;">ตอบแล้ว 0/20 ข้อ</div></div>
-<div class="err" id="err"></div>
-
-<!-- 2. แบบทดสอบ 20 ข้อ -->
-<div id="qs"></div>
-
-<!-- 3. ปุ่มบันทึก -->
-<div class="card" id="submitCard" style="border:2px solid var(--ac); text-align:center;">
-  <button id="go">บันทึกและดูผลคะแนน</button>
-  <button class="s" id="rs">ล้างคำตอบ</button>
-</div>
-
-<!-- 4. สรุปผล -->
-<div id="res">
-  <div class="card" style="border:2px solid var(--ac)">
-    <h2>สรุปผลการประเมินของคุณ <span id="rName" style="color:var(--ac)"></span></h2>
-    <p class="mut">รหัสนิสิต: <span id="rUid" style="font-weight:600"></span></p>
-    <p class="mut" style="margin-top:-10px">ช่วงเวลา: <span id="rWhen" style="font-weight:600"></span></p>
-    <p class="mut" style="margin-top:-10px">วันที่และเวลา: <span id="rDate" style="font-weight:600"></span></p>
-    
-    <div style="max-width:400px; margin:20px auto;"><canvas id="radarChart"></canvas></div>
-    <div id="bars"></div>
-    <div style="margin-top:16px;padding:12px;background:var(--acs);border-radius:8px;">
-      <p id="read" style="margin:0;font-size:1.1rem;"></p>
+  <div class="quiz-container">
+    <div class="header">
+      <div class="progress" id="progress">Question 1 / 30</div>
+      <div class="score" id="score">Score: 0</div>
     </div>
-    <p class="mut" style="margin-top:12px;font-size:0.85rem">เป้าหมายของโครงการนี้คือการลดพฤติกรรม "หลีกเลี่ยง" หรือ "ยอมตาม" และเพิ่มทักษะ <b>"ร่วมมือ" (Collaborating)</b> ในการทำงานกลุ่ม</p>
-  </div>
-</div>
 
-<!-- ระบบหลังบ้าน (Admin) -->
-<div class="admin-section">
-  <button class="s" id="toggleAdmin">🔒 เปิดระบบหลังบ้าน (ดูข้อมูลผู้ประเมินทั้งหมด)</button>
-</div>
+    <div id="quiz-body">
+      <div class="question-box">
+        <div class="question-text" id="question-text">Prompt</div>
+        <button class="audio-btn" id="play-audio-btn">🔊</button>
+      </div>
 
-<div id="adminPanel">
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-      <h2>📊 ระบบหลังบ้าน (Admin Dashboard)</h2>
-      <button class="s" id="closeAdmin">ปิด</button>
+      <div id="sentence-builder-mode">
+        <div class="answer-slot" id="answer-slot"></div>
+        <div class="tiles-area" id="tiles-area"></div>
+      </div>
+
+      <div id="choice-mode" class="choices-grid hidden"></div>
+
+      <div class="feedback" id="feedback"></div>
+
+      <button class="action-btn" id="submit-btn">Check Answer</button>
+      <button class="action-btn hidden" id="next-btn">Next Question ➔</button>
     </div>
-    <p class="mut">คลิกที่ชื่อเพื่อ <b>ย่อ/ขยาย</b> ดูผลการประเมินรายบุคคล (ลบข้อมูลรายคนได้ที่ปุ่ม 🗑️)</p>
-    
-    <div id="adminList"></div>
 
-    <div style="margin-top:20px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-      <button class="warning" id="genTest">➕ สร้างข้อมูล Test ทั้งหมด (10 คน)</button>
-      <button class="danger" id="clrAll">ลบข้อมูลทั้งหมด</button>
+    <div id="result-screen" class="hidden" style="text-align: center;">
+      <h2 style="font-size: 2rem; margin-bottom: 10px;">Quiz Completed!</h2>
+      <p style="font-size: 1.3rem; margin-bottom: 20px;" id="final-score"></p>
+      <button class="action-btn" onclick="restartQuiz()">Restart Quiz</button>
     </div>
   </div>
-</div>
 
-</div>
+  <script>
+    const vocabPool = ["ごはん", "みず", "おちゃ", "すし", "と", "です", "ください"];
 
-<script>
-var N={C:"แข่งขัน (Competing)",Co:"ร่วมมือ (Collaborating)",Cm:"ประนีประนอม (Compromising)",Av:"หลีกเลี่ยง (Avoiding)",Ac:"ยอมตาม (Accommodating)"},K=["C","Co","Cm","Av","Ac"];
-var Q=[
-["ฉันยืนยันให้ทีมใช้วิธีที่ฉันเห็นว่าดีที่สุด","C","ฉันชวนทุกคนคุยจนได้ทางออกที่ทุกคนพอใจจริง ๆ","Co"],
-["ฉันเลี่ยงไม่พูดเรื่องที่ทำให้บรรยากาศตึง","Av","ฉันยอมทำตามที่เพื่อนต้องการเพื่อให้เรื่องจบ","Ac"],
-["ฉันเสนอให้แบ่งครึ่งทาง ต่างฝ่ายต่างลดลงนิดหน่อย","Cm","ฉันไม่ถอยในเรื่องที่ฉันมั่นใจว่าถูก","C"],
-["ฉันเปิดประเด็นที่เห็นต่างขึ้นมาคุยตรง ๆ","Co","ฉันรอให้เรื่องเงียบไปเอง","Av"],
-["ฉันยอมเพื่อน เพราะเรื่องนั้นสำคัญกับเขามากกว่า","Ac","ฉันเสนอข้อตกลงกลาง ๆ ที่แต่ละฝ่ายได้บางส่วน","Cm"],
-["ถ้าเรื่องไม่สำคัญมาก ฉันปล่อยผ่านไม่เถียง","Av","ฉันพยายามโน้มน้าวให้เพื่อนเห็นตามฉัน","C"],
-["ฉันถามเหตุผลเบื้องหลังของแต่ละคน เพื่อหาทางที่ตอบโจทย์ทุกคน","Co","ฉันยอมตามเพื่อนเพื่อรักษาความสัมพันธ์","Ac"],
-["ฉันพยายามให้ความเห็นของฉันได้รับเลือก","C","ฉันยอมลดบางส่วน ถ้าอีกฝ่ายยอมลดเช่นกัน","Cm"],
-["ฉันเงียบหรือเปลี่ยนเรื่องเพื่อไม่ให้เกิดการเถียง","Av","ฉันเสนอให้ต่างคนต่างได้บางอย่างเพื่อให้เรื่องจบเร็ว","Cm"],
-["ฉันขอให้ทุกคนวางความเห็นไว้บนโต๊ะแล้วช่วยกันหาทางใหม่","Co","ฉันผลักดันวิธีของฉัน เพราะเชื่อว่าได้ผลที่สุด","C"],
-["ฉันตามใจเพื่อน เมื่อเห็นว่าเขาตั้งใจมาก","Ac","ฉันยืนกรานในจุดที่สำคัญกับฉัน","C"],
-["ฉันเลือกทางที่เร็ว ยอมกันคนละครึ่งก็พอ","Cm","ฉันใช้เวลาคุยลึกจนได้ทางที่ดีที่สุดสำหรับทุกคน","Co"],
-["ฉันเลี่ยงคุยเรื่องที่รู้ว่าจะเกิดการเถียง","Av","ฉันบอกความรู้สึกและฟังอีกฝ่ายจนเข้าใจตรงกัน","Co"],
-["ฉันพูดว่า \"ตามนั้นเลย\" เพื่อให้เรื่องจบ","Ac","ฉันถอยออกจากวงสนทนาเมื่อเริ่มเครียด","Av"],
-["ฉันขอให้เพื่อนยอมบ้าง และฉันก็ยอมบ้าง","Cm","ฉันยอมทั้งหมด ถ้าเพื่อนดูไม่สบายใจ","Ac"],
-["ฉันพูดตรง ๆ ว่าอีกฝ่ายพลาดตรงไหน","C","ฉันเก็บความเห็นไว้ ถ้าพูดแล้วน่าจะมีเรื่อง","Av"],
-["ฉันหาวิธีใหม่ที่ไม่มีใครต้องเสียอะไร","Co","ฉันหาจุดกึ่งกลางที่แต่ละคนยอมเสียบางอย่าง","Cm"],
-["ฉันให้เพื่อนตัดสินใจ เพื่อไม่ให้เสียบรรยากาศ","Ac","ฉันชวนเพื่อนวิเคราะห์ปัญหาร่วมกันก่อนตัดสินใจ","Co"],
-["ฉันปล่อยให้เรื่องผ่านไป ไม่เอามาคุย","Av","ฉันเสนอข้อตกลงที่ทุกคนรับได้ เพื่อไม่ให้เรื่องค้าง","Cm"],
-["ฉันไม่ยอมให้ใครเปลี่ยนใจฉันง่าย ๆ","C","ฉันปรับตามเพื่อน เพื่อไม่ให้เขาเสียใจ","Ac"]];
+    const rawQuestions = [
+      { type: "build", prompt: "Rice and water, please!", target: ["ごはん", "と", "みず", "ください"], audio: "ごはんとみず、ください" },
+      { type: "build", prompt: "Water and rice, please!", target: ["みず", "と", "ごはん", "ください"], audio: "みずとごはん、ください" },
+      { type: "build", prompt: "It's green tea.", target: ["おちゃ", "です"], audio: "おちゃです" },
+      { type: "build", prompt: "Sushi and green tea, please.", target: ["すし", "と", "おちゃ", "ください"], audio: "すしとおちゃ、ください" },
+      { type: "build", prompt: "Green tea and sushi, please.", target: ["おちゃ", "と", "すし", "ください"], audio: "おちゃとすし、ください" },
+      { type: "build", prompt: "Water and sushi, please.", target: ["みず", "と", "すし", "ください"], audio: "みずとすし、ください" },
+      { type: "build", prompt: "Sushi and water, please.", target: ["すし", "と", "みず", "ください"], audio: "すしとみず、ください" },
+      { type: "build", prompt: "It's rice.", target: ["ごはん", "です"], audio: "ごはんです" },
+      { type: "build", prompt: "It's water.", target: ["みず", "です"], audio: "みずです" },
+      { type: "build", prompt: "It's sushi.", target: ["すし", "です"], audio: "すしです" },
+      { type: "build", prompt: "Rice, please!", target: ["ごはん", "ください"], audio: "ごはん、ください" },
+      { type: "build", prompt: "Water, please!", target: ["みず", "ください"], audio: "みず、ください" },
+      { type: "build", prompt: "Green tea, please!", target: ["おちゃ", "ください"], audio: "おちゃ、ください" },
+      { type: "build", prompt: "Sushi, please!", target: ["すし", "ください"], audio: "すし、ください" },
+      { type: "build", prompt: "Rice and green tea, please.", target: ["ごはん", "と", "おちゃ", "ください"], audio: "ごはんとおちゃ、ください" },
+      { type: "build", prompt: "Green tea and rice, please.", target: ["おちゃ", "と", "ごはん", "ください"], audio: "おちゃとごはん、ください" },
+      { type: "build", prompt: "Sushi and rice, please.", target: ["すし", "と", "ごはん", "ください"], audio: "すしとごはん、ください" },
+      { type: "build", prompt: "Rice and sushi, please.", target: ["ごはん", "と", "すし", "ください"], audio: "ごはんとうし、ください" },
+      { type: "build", prompt: "Listen and build the sentence", target: ["ごはん", "と", "みず", "ください"], audio: "ごはんとみず、ください" },
+      { type: "build", prompt: "Listen and build the sentence", target: ["すし", "と", "おちゃ", "ください"], audio: "すしとおちゃ、ください" },
 
-var ans={}, KEY="tki_project_data_v2";
-var qs=document.getElementById("qs");
-var myRadarChart = null;
-var adminCharts = {};
-
-// สร้างข้อสอบ
-Q.forEach(function(q,i){
- var d=document.createElement("div");d.className="card";d.id="q"+i;
- d.innerHTML='<div class="q">ข้อ '+(i+1)+'</div>'+
- ["A","B"].map(function(L,j){return '<label class="o"><input type="radio" name="q'+i+'" value="'+q[j*2+1]+'"><span><b>'+L+'.</b> '+q[j*2]+'</span></label>';}).join("");
- qs.appendChild(d);
-});
-
-function upd(){var n=Object.keys(ans).length;document.getElementById("cnt").textContent="ตอบแล้ว "+n+"/20 ข้อ";document.getElementById("pg").style.width=(n*5)+"%";}
-qs.addEventListener("change",function(e){var m=e.target.name.slice(1);ans[m]=e.target.value;upd();});
-
-function loadData(){try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){return []}}
-function saveData(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
-
-function createRadarChart(canvasId, scores) {
-  var ctx = document.getElementById(canvasId).getContext('2d');
-  return new Chart(ctx, {
-    type: 'radar',
-    data: {
-      labels: ['แข่งขัน (C)', 'ร่วมมือ (Co)', 'ประนีประนอม (Cm)', 'หลีกเลี่ยง (Av)', 'ยอมตาม (Ac)'],
-      datasets: [{
-        label: 'คะแนน TKI',
-        data: [scores.C, scores.Co, scores.Cm, scores.Av, scores.Ac],
-        backgroundColor: 'rgba(109, 79, 214, 0.2)',
-        borderColor: '#6d4fd6',
-        pointBackgroundColor: '#6d4fd6',
-        borderWidth: 2
-      }]
-    },
-    options: { responsive: true, maintainAspectRatio: true, scales: { r: { min: 0, max: 12, ticks: { stepSize: 2 } } } }
-  });
-}
-
-// Render รายการใน Admin
-function renderAdminList(){
- var h=loadData(), el=document.getElementById("adminList");
- el.innerHTML = ""; adminCharts = {};
-
- if(!h.length){ el.innerHTML='<p class="mut" style="text-align:center;padding:20px;">ยังไม่มีข้อมูลผู้ประเมินในระบบ</p>'; return; }
- 
- h.forEach(function(r, idx){
-   var mx = Math.max.apply(null, K.map(function(k){return r.s[k]}));
-   var tops = K.filter(function(k){return r.s[k]===mx}).map(function(k){return N[k].split(" ")[0]});
-   
-   var card = document.createElement("div");
-   card.className = "card"; card.style.margin = "10px 0"; card.style.padding = "10px";
-   var canvasId = "adminChart_" + idx;
-   
-   var barsHtml = K.map(function(k){
-     return '<div class="r'+(r.s[k]===mx?" top":"")+'"><b><span>'+N[k]+'</span><span>'+r.s[k]+'/12</span></b><div class="t"><i style="width:'+(r.s[k]/12*100)+'%"></i></div></div>';
-   }).join("");
-
-   var isPre = r.w && r.w.indexOf("Pre-test") !== -1;
-   var badgeClass = isPre ? "badge-pre" : "badge-post";
-   var badgeText = isPre ? "Pre-test" : "Post-test";
-   
-   // เช็คว่าเป็นข้อมูล Test หรือไม่ (ถ้าใช่จะทำตัวหนังสือสีแดง)
-   var isTest = r.isTest || (r.n && r.n.toLowerCase().indexOf("test") !== -1);
-   var nameColor = isTest ? "color:var(--warn);" : "color:var(--ac);";
-
-   card.innerHTML = 
-     '<div class="acc-header" onclick="toggleAcc('+idx+', event)">'+
-       '<div style="flex:1;">'+
-         '<div>'+
-           '<span class="badge '+badgeClass+'">'+badgeText+'</span>'+
-           '<b style="'+nameColor+' font-size:1.05rem;">'+(r.n||"ไม่ระบุชื่อ")+'</b>'+
-         '</div>'+
-         '<div class="mut" style="font-size:0.85rem;margin-top:2px;">'+
-           'รหัส: '+(r.id||"-")+' | <span style="font-size:0.8rem;">'+r.d+'</span>'+
-         '</div>'+
-       '</div>'+
-       '<div style="display:flex;align-items:center;gap:10px;">'+
-         '<button class="del-btn" onclick="deleteSingle('+idx+', event)">🗑️ ลบ</button>'+
-         '<span id="accIcon_'+idx+'" style="font-weight:bold;font-size:1.1rem;">▼</span>'+
-       '</div>'+
-     '</div>'+
-     '<div class="acc-body" id="accBody_'+idx+'">'+
-       '<div style="max-width:320px; margin:10px auto;"><canvas id="'+canvasId+'"></canvas></div>'+
-       '<div>'+barsHtml+'</div>'+
-       '<div style="margin-top:12px;padding:10px;background:var(--acs);border-radius:8px;">'+
-         '<p style="margin:0;font-size:0.95rem;">รูปแบบสูงสุด: <b>'+tops.join(" และ ")+'</b></p>'+
-       '</div>'+
-     '</div>';
-     
-   el.appendChild(card);
-   adminCharts[idx] = { canvasId: canvasId, scores: r.s, instance: null };
- });
-}
-
-function toggleAcc(idx, e){
-  if(e && e.target.tagName === "BUTTON") return;
-  var body = document.getElementById("accBody_" + idx), icon = document.getElementById("accIcon_" + idx);
-  if(body.classList.contains("open")){ body.classList.remove("open"); icon.textContent = "▼"; } 
-  else {
-    body.classList.add("open"); icon.textContent = "▲";
-    if(adminCharts[idx] && !adminCharts[idx].instance){
-      adminCharts[idx].instance = createRadarChart(adminCharts[idx].canvasId, adminCharts[idx].scores);
-    }
-  }
-}
-
-function deleteSingle(idx, e){
-  if(e) e.stopPropagation();
-  var h = loadData(), target = h[idx], name = target ? target.n : "รายการนี้";
-  if(confirm("ต้องการลบข้อมูลประวัติของ \""+name+"\" ใช่หรือไม่?")){
-    h.splice(idx, 1); saveData(h); renderAdminList();
-  }
-}
-
-// สร้างข้อมูล Test รวม 10 คน (Pre 5 / Post 5) ให้มีคะแนนรวม 20
-document.getElementById("genTest").onclick=function(){
-  if(confirm("ต้องการสร้างข้อมูลทดสอบ (Test 10 คน) เพื่อดูตัวอย่างในแต่ละด้านใช่หรือไม่?")){
-    var h = loadData();
-    var nowStr = new Date().toLocaleString("th-TH");
-    var testData = [
-      // Pre-test 5 คน
-      {n: "Test Pre 1 - แข่งขัน", id: "00000000001", w: "Pre-test (ก่อนทำโครงการ)", d: nowStr, s: {C:12, Co:2, Cm:2, Av:2, Ac:2}, isTest: true},
-      {n: "Test Pre 2 - ร่วมมือ", id: "00000000002", w: "Pre-test (ก่อนทำโครงการ)", d: nowStr, s: {C:2, Co:12, Cm:2, Av:2, Ac:2}, isTest: true},
-      {n: "Test Pre 3 - ประนีประนอม", id: "00000000003", w: "Pre-test (ก่อนทำโครงการ)", d: nowStr, s: {C:2, Co:2, Cm:12, Av:2, Ac:2}, isTest: true},
-      {n: "Test Pre 4 - หลีกเลี่ยง", id: "00000000004", w: "Pre-test (ก่อนทำโครงการ)", d: nowStr, s: {C:2, Co:2, Cm:2, Av:12, Ac:2}, isTest: true},
-      {n: "Test Pre 5 - ยอมตาม", id: "00000000005", w: "Pre-test (ก่อนทำโครงการ)", d: nowStr, s: {C:2, Co:2, Cm:2, Av:2, Ac:12}, isTest: true},
-      
-      // Post-test 5 คน
-      {n: "Test Post 1 - แข่งขัน", id: "00000000006", w: "Post-test (หลังทำโครงการ)", d: nowStr, s: {C:12, Co:2, Cm:2, Av:2, Ac:2}, isTest: true},
-      {n: "Test Post 2 - ร่วมมือ", id: "00000000007", w: "Post-test (หลังทำโครงการ)", d: nowStr, s: {C:2, Co:12, Cm:2, Av:2, Ac:2}, isTest: true},
-      {n: "Test Post 3 - ประนีประนอม", id: "00000000008", w: "Post-test (หลังทำโครงการ)", d: nowStr, s: {C:2, Co:2, Cm:12, Av:2, Ac:2}, isTest: true},
-      {n: "Test Post 4 - หลีกเลี่ยง", id: "00000000009", w: "Post-test (หลังทำโครงการ)", d: nowStr, s: {C:2, Co:2, Cm:2, Av:12, Ac:2}, isTest: true},
-      {n: "Test Post 5 - ยอมตาม", id: "00000000010", w: "Post-test (หลังทำโครงการ)", d: nowStr, s: {C:2, Co:2, Cm:2, Av:2, Ac:12}, isTest: true}
+      { type: "choice", prompt: "How do you say 'Green tea'?", target: "おちゃ", choices: ["おちゃ", "みず", "ごはん", "すし"], audio: "おちゃ" },
+      { type: "choice", prompt: "How do you say 'Water'?", target: "みず", choices: ["みず", "おちゃ", "ごはん", "すし"], audio: "みず" },
+      { type: "choice", prompt: "How do you say 'Rice'?", target: "ごはん", choices: ["ごはん", "すし", "おちゃ", "みず"], audio: "ごはん" },
+      { type: "choice", prompt: "How do you say 'Sushi'?", target: "すし", choices: ["すし", "ごはん", "みず", "おちゃ"], audio: "すし" },
+      { type: "choice", prompt: "Listen and choose the word", target: "ください", choices: ["ください", "です", "と", "おちゃ"], audio: "ください" },
+      { type: "choice", prompt: "Listen and choose the word", target: "です", choices: ["です", "ください", "と", "ごはん"], audio: "です" },
+      { type: "choice", prompt: "How do you say 'and' in Japanese?", target: "と", choices: ["と", "です", "ください", "すし"], audio: "と" },
+      { type: "choice", prompt: "Listen and choose the matching word", target: "みず", choices: ["mizu", "gohan", "ocha", "sushi"], audio: "みず" },
+      { type: "choice", prompt: "Listen and choose the matching word", target: "ごはん", choices: ["gohan", "ocha", "sushi", "mizu"], audio: "ごはん" },
+      { type: "choice", prompt: "Listen and choose the matching word", target: "すし", choices: ["sushi", "gohan", "mizu", "ocha"], audio: "すし" }
     ];
-    saveData(h.concat(testData));
-    renderAdminList();
-    alert("สร้างข้อมูลทดสอบครบ 10 คนเรียบร้อยแล้ว");
-  }
-};
 
-document.getElementById("go").onclick=function(){
- var miss=[];for(var i=0;i<20;i++)if(!ans[i])miss.push(i+1);
- var uName=document.getElementById("uname").value.trim(), uId=document.getElementById("uid").value.trim(), er=document.getElementById("err"), msgs=[];
- if(!uName) msgs.push("กรุณากรอกชื่อ-นามสกุลของคุณ");
- if(!uId || !/^\d{11}$/.test(uId)) msgs.push("กรุณากรอกรหัสนิสิตให้ครบ 11 หลัก (ตัวเลขเท่านั้น)");
- if(miss.length) msgs.push("ยังตอบไม่ครบ (ขาดข้อ: "+miss.join(", ")+")");
- 
- if(msgs.length){
-   er.innerHTML = msgs.join("<br>"); er.style.display="block";
-   if(!uName || !uId){ document.getElementById("infoCard").scrollIntoView({behavior:"smooth"}); if(!uName) document.getElementById("uname").focus(); else document.getElementById("uid").focus(); }
-   else{ document.getElementById("q"+(miss[0]-1)).scrollIntoView({behavior:"smooth",block:"center"}); } return;
- }
- er.style.display="none";
- 
- var s={C:0,Co:0,Cm:0,Av:0,Ac:0};for(var k in ans)s[ans[k]]++;
- var w=document.getElementById("when").value, mx=Math.max.apply(null,K.map(function(k){return s[k]})), nowStr=new Date().toLocaleString("th-TH");
- 
- document.getElementById("rName").textContent="("+uName+")"; document.getElementById("rUid").textContent=uId; document.getElementById("rWhen").textContent=w; document.getElementById("rDate").textContent=nowStr;
- document.getElementById("bars").innerHTML=K.map(function(k){return '<div class="r'+(s[k]===mx?" top":"")+'"><b><span>'+N[k]+'</span><span>'+s[k]+'/12</span></b><div class="t"><i style="width:'+(s[k]/12*100)+'%"></i></div></div>'}).join("");
- 
- var tops=K.filter(function(k){return s[k]===mx}).map(function(k){return N[k].split(" ")[0]});
- document.getElementById("read").innerHTML="รูปแบบการจัดการความขัดแย้งที่คุณใช้บ่อยที่สุดคือ: <b>"+tops.join(" และ ")+"</b>";
+    let questions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let userSentence = [];
+    let selectedChoice = null;
 
- if (myRadarChart) { myRadarChart.destroy(); } myRadarChart = createRadarChart('radarChart', s);
- 
- var h=loadData(); h.push({n:uName, id:uId, w:w, d:nowStr, s:s, isTest:false}); saveData(h); renderAdminList();
- 
- document.getElementById("res").style.display="block"; document.getElementById("res").scrollIntoView({behavior:"smooth"});
- document.getElementById("go").textContent="บันทึกเรียบร้อยแล้ว"; document.getElementById("go").disabled=true; document.getElementById("go").style.opacity=0.5;
-};
+    function shuffleArray(arr) {
+      return arr.sort(() => Math.random() - 0.5);
+    }
 
-document.getElementById("rs").onclick=function(){
- ans={}; document.querySelectorAll("input[type=radio]").forEach(function(r){r.checked=false});
- document.getElementById("uname").value=""; document.getElementById("uid").value="";
- document.getElementById("res").style.display="none"; document.getElementById("go").textContent="บันทึกและดูผลคะแนน"; document.getElementById("go").disabled=false; document.getElementById("go").style.opacity=1; document.getElementById("err").style.display="none"; upd(); window.scrollTo({top:0, behavior:"smooth"});
-};
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ja-JP';
+        utterance.rate = 0.85;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
 
-var adm=document.getElementById("adminPanel");
-document.getElementById("toggleAdmin").onclick=function(){
- var pass = prompt("กรุณากรอกรหัสผ่านเพื่อเข้าสู่ระบบหลังบ้าน:");
- if(pass === "EE33") { renderAdminList(); adm.style.display="block"; adm.scrollIntoView({behavior:"smooth"}); } 
- else if(pass !== null) { alert("รหัสผ่านไม่ถูกต้อง!"); }
-};
-document.getElementById("closeAdmin").onclick=function(){ adm.style.display="none"; };
-document.getElementById("clrAll").onclick=function(){
- if(confirm("⚠️ คำเตือน: คุณต้องการลบข้อมูลประวัติการทำประเมินของทุกคนในระบบหลังบ้านใช่หรือไม่? (การกระทำนี้ย้อนกลับไม่ได้)")){ saveData([]); renderAdminList(); }
-};
-</script>
+    function initQuiz() {
+      questions = shuffleArray([...rawQuestions]);
+      currentIndex = 0;
+      score = 0;
+      document.getElementById("score").textContent = `Score: ${score}`;
+      document.getElementById("result-screen").classList.add("hidden");
+      document.getElementById("quiz-body").classList.remove("hidden");
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      userSentence = [];
+      selectedChoice = null;
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("feedback").className = "feedback";
+      document.getElementById("submit-btn").classList.remove("hidden");
+      document.getElementById("next-btn").classList.add("hidden");
+
+      const q = questions[currentIndex];
+      document.getElementById("progress").textContent = `Question ${currentIndex + 1} / 30`;
+      document.getElementById("question-text").textContent = q.prompt;
+
+      document.getElementById("play-audio-btn").onclick = () => speak(q.audio);
+
+      if (q.type === "build") {
+        document.getElementById("sentence-builder-mode").classList.remove("hidden");
+        document.getElementById("choice-mode").classList.add("hidden");
+        renderSentenceBuilder(q);
+      } else {
+        document.getElementById("sentence-builder-mode").classList.add("hidden");
+        document.getElementById("choice-mode").classList.remove("hidden");
+        renderChoiceMode(q);
+      }
+
+      speak(q.audio);
+    }
+
+    function renderSentenceBuilder(q) {
+      const answerSlot = document.getElementById("answer-slot");
+      const tilesArea = document.getElementById("tiles-area");
+      answerSlot.innerHTML = "";
+      tilesArea.innerHTML = "";
+
+      let tiles = [...q.target];
+      while (tiles.length < q.target.length + 2) {
+        let randomWord = vocabPool[Math.floor(Math.random() * vocabPool.length)];
+        if (!tiles.includes(randomWord)) tiles.push(randomWord);
+      }
+      tiles = shuffleArray(tiles);
+
+      tiles.forEach((word, idx) => {
+        const tile = document.createElement("div");
+        tile.className = "tile";
+        tile.textContent = word;
+        tile.id = `tile-${idx}`;
+        tile.onclick = () => selectTile(word, idx);
+        tilesArea.appendChild(tile);
+      });
+    }
+
+    function selectTile(word, idx) {
+      const tile = document.getElementById(`tile-${idx}`);
+      if (tile.style.visibility === "hidden") return;
+
+      userSentence.push({ word, idx });
+      tile.style.visibility = "hidden";
+      renderAnswerSlot();
+    }
+
+    function renderAnswerSlot() {
+      const answerSlot = document.getElementById("answer-slot");
+      answerSlot.innerHTML = "";
+
+      userSentence.forEach((item, slotIdx) => {
+        const tile = document.createElement("div");
+        tile.className = "tile";
+        tile.textContent = item.word;
+        tile.onclick = () => deselectTile(slotIdx);
+        answerSlot.appendChild(tile);
+      });
+    }
+
+    function deselectTile(slotIdx) {
+      const removed = userSentence.splice(slotIdx, 1)[0];
+      document.getElementById(`tile-${removed.idx}`).style.visibility = "visible";
+      renderAnswerSlot();
+    }
+
+    function renderChoiceMode(q) {
+      const container = document.getElementById("choice-mode");
+      container.innerHTML = "";
+
+      let choices = shuffleArray([...q.choices]);
+      choices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.className = "choice-btn";
+        btn.textContent = choice;
+        btn.onclick = () => {
+          document.querySelectorAll(".choice-btn").forEach(b => b.style.backgroundColor = "var(--tile-bg)");
+          btn.style.backgroundColor = "var(--accent)";
+          btn.style.color = "#000";
+          selectedChoice = choice;
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    document.getElementById("submit-btn").onclick = () => {
+      const q = questions[currentIndex];
+      let isCorrect = false;
+
+      if (q.type === "build") {
+        const userBuiltStr = userSentence.map(i => i.word).join("");
+        const targetStr = q.target.join("");
+        isCorrect = (userBuiltStr === targetStr);
+      } else {
+        isCorrect = (selectedChoice === q.target);
+      }
+
+      const feedback = document.getElementById("feedback");
+      if (isCorrect) {
+        feedback.textContent = "Correct! / 正解！";
+        feedback.className = "feedback correct";
+        score++;
+        document.getElementById("score").textContent = `Score: ${score}`;
+      } else {
+        feedback.textContent = `Incorrect! Correct answer: ${Array.isArray(q.target) ? q.target.join(" ") : q.target}`;
+        feedback.className = "feedback incorrect";
+      }
+
+      document.getElementById("submit-btn").classList.add("hidden");
+      document.getElementById("next-btn").classList.remove("hidden");
+    };
+
+    document.getElementById("next-btn").onclick = () => {
+      currentIndex++;
+      if (currentIndex < questions.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    };
+
+    function showResult() {
+      document.getElementById("quiz-body").classList.add("hidden");
+      document.getElementById("result-screen").classList.remove("hidden");
+      document.getElementById("final-score").textContent = `Your final score: ${score} / 30`;
+    }
+
+    function restartQuiz() {
+      initQuiz();
+    }
+
+    window.onload = initQuiz;
+  </script>
 </body>
 </html>
