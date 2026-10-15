@@ -33,7 +33,7 @@
             box-sizing: border-box;
         }
 
-        /* ----- Progress Bar & Combo Style ปรับใหม่ ----- */
+        /* ----- Progress Bar & Combo Style ปรับไล่สี เขียว -> ส้ม -> แดง ----- */
         .progress-header {
             display: flex;
             justify-content: space-between;
@@ -59,13 +59,23 @@
             width: 0%;
             background: var(--primary);
             border-radius: 10px;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease, box-shadow 0.4s ease;
         }
 
-        /* เปลี่ยนสี Combo จากสีรุ้งเป็นโทนส้ม-ส้มแดง อบอุ่น นุ่มนวล */
-        .progress-bar.combo-active {
-            background: linear-gradient(90deg, #ff8c00, #f97316, #ef4444);
-            box-shadow: 0 0 12px rgba(249, 115, 22, 0.4);
+        /* ระดับสี Combo ตามจำนวนสะสม */
+        .progress-bar.combo-green {
+            background: #10b981;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .progress-bar.combo-orange {
+            background: #f97316;
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+        }
+
+        .progress-bar.combo-red {
+            background: #ef4444;
+            box-shadow: 0 0 14px rgba(239, 68, 68, 0.5);
         }
 
         .combo-badge {
@@ -79,25 +89,29 @@
         .combo-text {
             font-size: 0.95rem;
             font-weight: 700;
-            color: #ea580c;
-            background: #fff7ed;
-            border: 1px solid #ffedd5;
+            color: #64748b;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
             padding: 4px 12px;
             border-radius: 20px;
             opacity: 0;
             transform: translateY(-4px);
-            transition: opacity 0.2s ease, transform 0.2s ease;
+            transition: all 0.2s ease;
         }
         
         .combo-text.active {
             opacity: 1;
             transform: translateY(0);
-            animation: pulse-glow 1.2s ease-in-out infinite alternate;
         }
 
+        /* สไตล์ข้อความ Combo เปลี่ยนสีตามระดับ */
+        .combo-text.text-green { color: #059669; background: #ecfdf5; border-color: #a7f3d0; }
+        .combo-text.text-orange { color: #ea580c; background: #fff7ed; border-color: #ffedd5; }
+        .combo-text.text-red { color: #dc2626; background: #fef2f2; border-color: #fecaca; animation: pulse-glow 1.2s ease-in-out infinite alternate; }
+
         @keyframes pulse-glow {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.2); }
-            100% { transform: scale(1.05); box-shadow: 0 0 8px 2px rgba(234, 88, 12, 0.2); }
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); }
+            100% { transform: scale(1.05); box-shadow: 0 0 8px 2px rgba(239, 68, 68, 0.3); }
         }
 
         .header {
@@ -265,7 +279,6 @@ function playSound(type) {
     }
 }
 
-// ฟังก์ชันอ่านเสียงภาษาญี่ปุ่น (แก้ไขเพิ่มเติมเพื่อให้สะดุดน้อยลง)
 function speakJapaneseText(text) {
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
@@ -374,15 +387,25 @@ function updateProgressBar() {
     document.getElementById('gauge-counter').innerText = `${currentIndex} / ${total}`;
     bar.style.width = pct + '%';
 
-    // การแสดงผล Combo แบบปรับปรุงสีใหม่
-    if (combo >= 2) {
-        bar.classList.add('combo-active');
+    // เคลียร์คลาสเดิมออก
+    bar.classList.remove('combo-green', 'combo-orange', 'combo-red');
+    comboTxt.classList.remove('active', 'text-green', 'text-orange', 'text-red');
+
+    // ปรับเปลี่ยนสีตามระดับ Combo (เขียว -> ส้ม -> แดง)
+    if (combo >= 8) {
+        bar.classList.add('combo-red');
+        comboTxt.innerText = `🔥 Combo x${combo}! (MAX)`;
+        comboTxt.classList.add('active', 'text-red');
+    } else if (combo >= 5) {
+        bar.classList.add('combo-orange');
         comboTxt.innerText = `⚡ Combo x${combo}`;
-        comboTxt.classList.add('active');
+        comboTxt.classList.add('active', 'text-orange');
+    } else if (combo >= 2) {
+        bar.classList.add('combo-green');
+        comboTxt.innerText = `🌱 Combo x${combo}`;
+        comboTxt.classList.add('active', 'text-green');
     } else {
-        bar.classList.remove('combo-active');
         comboTxt.innerText = `⚡ Combo x${combo}`;
-        comboTxt.classList.remove('active');
     }
 }
 
@@ -425,14 +448,16 @@ function showQuestion() {
         shuffleArray(q.words).forEach(word => {
             const chip = document.createElement('div'); chip.className = 'word-chip'; chip.innerText = word;
             
-            // เพิ่มการกดคลิกชิปแล้วส่งเสียงอ่านคำภาษาญี่ปุ่นออกมาทันที
             chip.onclick = () => {
                 playSound('click');
-                speakJapaneseText(word); // อ่านคำสะกดภาษาญี่ปุ่นทันทีที่แตะ
 
+                // อ่านเสียงเฉพาะตอน "ย้ายเข้าช่องตอบ" (จาก Pool -> Zone) เท่านั้น
                 if (chip.parentElement === wordPool) {
-                    answerZone.appendChild(chip); userSelectedSequence.push(word);
+                    speakJapaneseText(word);
+                    answerZone.appendChild(chip); 
+                    userSelectedSequence.push(word);
                 } else {
+                    // เอากลับเข้าช่องเดิม: ไม่มีการสะกดคำ เล่นแค่เสียงคลิก
                     wordPool.appendChild(chip);
                     const idx = userSelectedSequence.indexOf(word);
                     if (idx > -1) userSelectedSequence.splice(idx, 1);
