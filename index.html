@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แบบฝึกหัดภาษาญี่ปุ่น (Advanced)</title>
+    <title>แบบฝึกหัดภาษาญี่ปุ่น</title>
     <style>
         :root {
             --primary: #4f46e5;
@@ -36,16 +36,12 @@
         }
 
         .header {
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-
-        .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
         }
 
         .progress {
@@ -60,22 +56,6 @@
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 600;
-        }
-
-        /* Progress Bar Styles */
-        .progress-bar-container {
-            width: 100%;
-            height: 10px;
-            background-color: #e5e7eb;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            background-color: var(--success);
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .question-box {
@@ -101,8 +81,11 @@
             align-items: center;
             gap: 8px;
             margin-bottom: 15px;
+            transition: all 0.2s ease;
             font-weight: 600;
         }
+
+        .audio-btn:hover { background: #2563eb; transform: translateY(-1px); }
 
         .options {
             display: flex;
@@ -118,7 +101,13 @@
             font-size: 1.1rem;
             text-align: left;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: #e0e7ff;
+            transform: translateX(4px);
         }
 
         .option-btn.selected {
@@ -127,71 +116,153 @@
             font-weight: bold;
         }
 
-        /* Unscramble Styles */
         .word-pool, .answer-zone {
-            display: flex; flex-wrap: wrap; gap: 10px; min-height: 55px; padding: 12px;
-            border-radius: 12px; margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 55px;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
         }
-        .answer-zone { border: 2px dashed #a5b4fc; background: #f8fafc; }
-        .word-chip {
-            background: #ffffff; border: 1px solid #cbd5e1; padding: 10px 16px;
-            border-radius: 10px; font-size: 1.1rem; cursor: pointer; user-select: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.06); transition: transform 0.2s;
-        }
-        .word-chip:hover { transform: translateY(-2px); border-color: var(--primary); }
 
-        /* Matching Grid Styles */
-        .matching-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        .answer-zone {
+            border: 2px dashed #a5b4fc;
+            background: #f8fafc;
         }
-        
-        .match-btn {
+
+        .word-chip {
             background: #ffffff;
-            border: 2px solid #e5e7eb;
-            padding: 15px;
+            border: 1px solid #cbd5e1;
+            padding: 10px 16px;
             border-radius: 10px;
             font-size: 1.1rem;
-            text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
             user-select: none;
-        }
-        
-        .match-btn.selected {
-            border-color: var(--primary);
-            background: #e0e7ff;
-            transform: scale(1.02);
-        }
-        
-        .match-btn.matched {
-            border-color: var(--success);
-            background: #dcfce7;
-            color: #15803d;
-            pointer-events: none;
-            opacity: 0.6;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: popIn 0.3s ease forwards;
         }
 
-        .action-btn-group { display: flex; gap: 10px; margin-top: 15px; }
-        .check-btn, .next-btn {
-            width: 100%; color: white; border: none; padding: 12px; border-radius: 10px;
-            font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s;
+        .word-chip:hover {
+            transform: translateY(-3px) scale(1.03);
+            border-color: var(--primary);
+            box-shadow: 0 5px 12px rgba(79, 70, 229, 0.15);
         }
-        .check-btn { background: var(--primary); }
-        .check-btn:disabled { background: #9ca3af; cursor: not-allowed; }
-        .next-btn { background: #10b981; display: none; }
+
+        .word-chip:active {
+            transform: translateY(0) scale(0.97);
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .action-btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .check-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .check-btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+        .next-btn {
+            width: 100%;
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+            transition: all 0.2s ease;
+        }
+
+        .next-btn:hover { background: #059669; transform: translateY(-1px); }
 
         .feedback {
-            margin-top: 20px; padding: 15px; border-radius: 10px; display: none;
-            font-weight: 500; line-height: 1.6;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            font-weight: 500;
+            line-height: 1.6;
+            animation: fadeIn 0.3s ease;
         }
-        .feedback.correct { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
-        .feedback.wrong { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
 
-        .end-screen { text-align: center; padding: 30px 10px; }
-        .end-buttons { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-        .restart-btn { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-size: 1.1rem; cursor: pointer; font-weight: bold;}
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback.correct {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #86efac;
+        }
+
+        .feedback.wrong {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+        }
+
+        .end-screen {
+            text-align: center;
+            padding: 30px 10px;
+        }
+
+        .end-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .restart-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .restart-btn:hover { transform: scale(1.02); background: var(--primary-hover); }
+
+        .retry-mistakes-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .retry-mistakes-btn:hover { transform: scale(1.02); background: #dc2626; }
     </style>
 </head>
 <body>
@@ -199,19 +270,14 @@
 <div class="container">
     <div id="quiz-screen">
         <div class="header">
-            <div class="header-top">
-                <span class="part-badge" id="part-title">Part 1</span>
-                <span class="progress" id="progress-text">ข้อ 1 / 15</span>
-            </div>
-            <div class="progress-bar-container">
-                <div class="progress-bar-fill" id="progress-fill"></div>
-            </div>
+            <span class="part-badge" id="part-title">Part 1</span>
+            <span class="progress" id="progress-text">ข้อ 1 / 15</span>
         </div>
 
         <div class="question-box">
             <div class="question-text" id="question-text">คำถามจะแสดงตรงนี้</div>
             <button id="audio-btn" class="audio-btn" onclick="playQuestionAudio()" style="display: none;">
-                🔊 ฟังเสียง
+                🔊 กดเพื่อฟังเสียงโจทย์
             </button>
             <div id="interactive-area"></div>
         </div>
@@ -229,256 +295,335 @@
         <p style="font-size: 1.5rem; font-weight: bold; margin: 20px 0;">
             คุณได้คะแนน: <span id="final-score" style="color: var(--primary);">0</span> / <span id="total-score">15</span>
         </p>
+        
         <div class="end-buttons">
-            <button class="restart-btn" onclick="startQuiz()">🔄 สุ่มเริ่มทำใหม่ (เน้นข้อที่เคยผิด)</button>
+            <button id="retry-mistakes-btn" class="retry-mistakes-btn" onclick="startMistakesQuiz()" style="display: none;">
+                ❌ ทำข้อที่ผิดซ้ำ (<span id="wrong-count">0</span> ข้อ)
+            </button>
+            <button class="restart-btn" onclick="startQuiz()">🔄 สุ่มเริ่มทำใหม่ 15 ข้อ</button>
         </div>
     </div>
 </div>
 
 <script>
-// ==========================================
-// 1. เพิ่มคำศัพท์ใหม่ตรงนี้ได้เลย (Vocabulary List)
-// ==========================================
-const vocabularyList = [
-    { j: 'ごはん', t: 'ข้าว', r: 'Gohan' },
-    { j: 'みず', t: 'น้ำ', r: 'Mizu' },
-    { j: 'おちゃ', t: 'ชาเขียว', r: 'Ocha' },
-    { j: 'すし', t: 'ซูชิ', r: 'Sushi' },
-    // เพิ่มคำศัพท์ตัวอย่างให้เห็นการขยายระบบ
-    { j: 'えき', t: 'สถานีรถไฟ', r: 'Eki' },
-    { j: 'くるま', t: 'รถยนต์', r: 'Kuruma' },
-    { j: 'としょかん', t: 'ห้องสมุด', r: 'Toshokan' }
-];
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-let questions = [];
-let currentIndex = 0;
-let score = 0;
-let hasFailedThisQuestion = false;
+window.speechSynthesis.getVoices(); 
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = window.speechSynthesis.getVoices;
+}
 
-// Variables for interactive parts
-let selectedChoiceIndex = null;
-let userSelectedSequence = [];
-let matchingState = { selectedJp: null, selectedTh: null, matchedPairs: 0, totalPairs: 4 };
+function playSound(type) {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
 
-// ==========================================
-// Generator & Logic
-// ==========================================
-function generateAllQuestions() {
+    const now = audioCtx.currentTime;
+
+    if (type === 'click') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(450, now);
+        osc.frequency.exponentialRampToValueAtTime(850, now + 0.04);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+        
+        osc.start(now);
+        osc.stop(now + 0.04);
+    } 
+    else if (type === 'correct') {
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+            gain.gain.setValueAtTime(0.2, now + idx * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.3);
+
+            osc.start(now + idx * 0.08);
+            osc.stop(now + idx * 0.08 + 0.3);
+        });
+    } 
+    else if (type === 'wrong') {
+        [0, 0.18].forEach(delay => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(130, now + delay);
+            gain.gain.setValueAtTime(0.25, now + delay);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + delay + 0.15);
+
+            osc.start(now + delay);
+            osc.stop(now + delay + 0.15);
+        });
+    }
+}
+
+function speakJapaneseText(text) {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        
+        const cleanText = text.replace(/[。、！!]/g, '').trim();
+        if (cleanText === '') return;
+        
+        setTimeout(() => {
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'ja-JP';
+            utterance.rate = 0.85;
+            
+            const voices = window.speechSynthesis.getVoices();
+            const jaVoice = voices.find(v => v.lang === 'ja-JP' || v.lang.includes('ja'));
+            if (jaVoice) {
+                utterance.voice = jaVoice;
+            }
+            
+            window.speechSynthesis.speak(utterance);
+        }, 50);
+    }
+}
+
+// ----------------------------------------------------
+// ระบบสร้างโจทย์อัตโนมัติ 92 ข้อ (Auto-Generator)
+// ----------------------------------------------------
+const allGeneratedQuestions = (function generateAllQuestions() {
     let generated = [];
     let id = 1;
+    
+    const v = [
+        { j: 'ごはん', t: 'ข้าว', r: 'Gohan' },
+        { j: 'みず', t: 'น้ำ', r: 'Mizu' },
+        { j: 'おちゃ', t: 'ชาเขียว', r: 'Ocha' },
+        { j: 'すし', t: 'ซูชิ', r: 'Sushi' }
+    ];
+
     let bases = [];
     
-    // สร้างประโยคพื้นฐาน
-    for (let i = 0; i < vocabularyList.length; i++) {
-        for (let k = 0; k < vocabularyList.length; k++) {
+    for (let i = 0; i < v.length; i++) {
+        for (let k = 0; k < v.length; k++) {
             if (i === k) continue;
             bases.push({
-                vocabObj: vocabularyList[i], // เก็บ reference ไว้ทำ Spaced Repetition
-                ja: `${vocabularyList[i].j}と${vocabularyList[k].j}、ください。`,
-                th: `ขอ${vocabularyList[i].t}และ${vocabularyList[k].t}ครับ/ค่ะ`,
-                romaji: `${vocabularyList[i].r} to ${vocabularyList[k].r}, kudasai.`,
+                ja: `${v[i].j}と${v[k].j}、ください。`,
+                th: `ขอ${v[i].t}และ${v[k].t}ครับ/ค่ะ`,
+                romaji: `${v[i].r} to ${v[k].r}, kudasai.`,
                 type: 'AとB',
-                words: [vocabularyList[i].j, 'と', `${vocabularyList[k].j}、`, 'ください。']
+                words: [v[i].j, 'と', `${v[k].j}、`, 'ください。']
             });
         }
     }
     
-    vocabularyList.forEach(x => {
-        bases.push({ vocabObj: x, ja: `${x.j}です。`, th: `คือ${x.t}ครับ/ค่ะ`, romaji: `${x.r} desu.`, type: 'Aです', words: [x.j, 'です。'] });
-        bases.push({ vocabObj: x, ja: `${x.j}、ください。`, th: `ขอ${x.t}ครับ/ค่ะ`, romaji: `${x.r}, kudasai.`, type: 'Aください', words: [`${x.j}、`, 'ください。'] });
-    });
+    v.forEach(x => bases.push({
+        ja: `${x.j}です。`, th: `คือ${x.t}ครับ/ค่ะ`, romaji: `${x.r} desu.`, type: 'Aです', words: [x.j, 'です。']
+    }));
+    
+    v.forEach(x => bases.push({
+        ja: `${x.j}、ください。`, th: `ขอ${x.t}ครับ/ค่ะ`, romaji: `${x.r}, kudasai.`, type: 'Aください', words: [`${x.j}、`, 'ください。']
+    }));
+    
+    v.forEach(x => bases.push({
+        ja: x.j, th: x.t, romaji: x.r, type: 'A', words: [x.j]
+    }));
 
     function getWrongOptions(correctStr, key, count) {
         let options = bases.filter(b => b[key] !== correctStr).map(b => b[key]);
-        return [...new Set(options)].sort(() => 0.5 - Math.random()).slice(0, count);
+        options.sort(() => 0.5 - Math.random());
+        return [...new Set(options)].slice(0, count);
     }
 
-    // Part 1: Choice & Part 2: Listening & Part 3: Unscramble
+    // Part 1: Choice
     bases.forEach(b => {
-        let opts1 = getWrongOptions(b.th, 'th', 2); opts1.push(b.th);
-        generated.push({ id: id++, type: 'choice', part: 'Part 1: อ่านและแปล', q: `คำแปลของ "${b.ja}" คือข้อใด?`, options: opts1.sort(() => 0.5 - Math.random()), ansStr: b.th, vocabObj: b.vocabObj, ja: b.ja, romaji: b.romaji, th: b.th });
+        let opts1 = getWrongOptions(b.th, 'th', 2);
+        opts1.push(b.th);
+        opts1.sort(() => 0.5 - Math.random());
+        generated.push({
+            id: id++, type: 'choice', part: 'Part 1: อ่านและแปล', 
+            q: `คำแปลของ "${b.ja}" คือข้อใด?`, options: opts1, ans: opts1.indexOf(b.th),
+            ja: b.ja, romaji: b.romaji, th: b.th
+        });
 
-        let opts2 = getWrongOptions(b.ja, 'ja', 2); opts2.push(b.ja);
-        generated.push({ id: id++, type: 'listening', part: 'Part 2: ฟังเสียง', q: '🔊 ฟังเสียงแล้วเลือกประโยคที่ตรงกัน', options: opts2.sort(() => 0.5 - Math.random()), ansStr: b.ja, vocabObj: b.vocabObj, ja: b.ja, romaji: b.romaji, th: b.th });
-
-        if(b.words.length > 1) {
-            let allDecoys = ['と', 'です。', 'ください。', 'みず、', 'すし、'].filter(c => !b.words.includes(c));
-            let finalWords = [...b.words, ...allDecoys.sort(() => 0.5 - Math.random()).slice(0, 2)];
-            generated.push({ id: id++, type: 'unscramble', part: 'Part 3: เรียงประโยค', q: `เรียงคำให้ถูกต้อง: "${b.th}"`, words: finalWords, correctSeq: b.words, vocabObj: b.vocabObj, ja: b.ja, romaji: b.romaji, th: b.th });
-        }
+        let opts2 = getWrongOptions(b.ja, 'ja', 2);
+        opts2.push(b.ja);
+        opts2.sort(() => 0.5 - Math.random());
+        generated.push({
+            id: id++, type: 'choice', part: 'Part 1: อ่านและแปล', 
+            q: `ภาษาญี่ปุ่นของ "${b.th}" คือข้อใด?`, options: opts2, ans: opts2.indexOf(b.ja),
+            ja: b.ja, romaji: b.romaji, th: b.th
+        });
     });
 
-    // Part 4: Matching Pairs (สร้างโจทย์จับคู่จากคำศัพท์โดยตรง)
-    for (let i = 0; i < 15; i++) {
-        let shuffledVocab = [...vocabularyList].sort(() => 0.5 - Math.random()).slice(0, 4);
+    // Part 2: Listening
+    bases.forEach(b => {
+        let opts = getWrongOptions(b.ja, 'ja', 2);
+        opts.push(b.ja);
+        opts.sort(() => 0.5 - Math.random());
         generated.push({
-            id: id++, type: 'matching', part: 'Part 4: จับคู่คำศัพท์', q: 'จับคู่คำศัพท์ภาษาญี่ปุ่นกับคำแปลภาษาไทยให้ถูกต้อง',
-            pairs: shuffledVocab, vocabObj: shuffledVocab[0] // ผูกกับคำแรกเผื่อเก็บสถิติ
+            id: id++, type: 'listening', part: 'Part 2: ฟังเสียง', 
+            q: '🔊 ฟังเสียงแล้วเลือกประโยคภาษาญี่ปุ่นที่ตรงกัน', audioText: b.ja, 
+            options: opts, ans: opts.indexOf(b.ja),
+            ja: b.ja, romaji: b.romaji, th: b.th
         });
-    }
+    });
+
+    // Part 3: Unscramble
+    const allChips = ['ごはん', 'みず', 'おちゃ', 'すし', 'と', 'です。', 'ください。', 'みず、', 'すし、', 'おちゃ、', 'ごはん、'];
+    
+    bases.filter(b => b.type !== 'A').forEach(b => {
+        let decoys = allChips.filter(c => !b.words.includes(c)).sort(() => 0.5 - Math.random()).slice(0, 2);
+        let finalWords = [...b.words, ...decoys];
+
+        generated.push({
+            id: id++, type: 'unscramble', part: 'Part 3: เรียงประโยค', 
+            q: `เรียงคำให้ถูกต้อง: "${b.th}"`, 
+            words: finalWords, correctSeq: b.words, 
+            ja: b.ja, romaji: b.romaji, th: b.th
+        });
+    });
 
     return generated;
+})();
+
+let questions = [];
+let wrongQuestions = [];
+let currentIndex = 0;
+let score = 0;
+let selectedChoiceIndex = null;
+let userSelectedSequence = [];
+let hasScoredThisQuestion = false; 
+let hasFailedThisQuestion = false;
+
+function shuffleArray(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
 }
 
-// ==========================================
-// Spaced Repetition (localStorage)
-// ==========================================
-function recordMistake(vocabObj) {
-    if(!vocabObj) return;
-    let memory = JSON.parse(localStorage.getItem('jp_memory') || '{}');
-    memory[vocabObj.j] = (memory[vocabObj.j] || 0) + 1;
-    localStorage.setItem('jp_memory', JSON.stringify(memory));
-}
-
-function getSessionQuestions() {
-    const allQ = generateAllQuestions();
-    let memory = JSON.parse(localStorage.getItem('jp_memory') || '{}');
-    
-    // ให้คะแนนโจทย์ ถ้าโจทย์ไหนมีคำศัพท์ที่เคยผิดบ่อย จะโดนดึงมาทำก่อน
-    allQ.forEach(q => {
-        q.errorScore = q.vocabObj && memory[q.vocabObj.j] ? memory[q.vocabObj.j] : 0;
-        // แรนด้อมนิดหน่อยให้ไม่ซ้ำซาก
-        q.sortWeight = q.errorScore * 10 + Math.random(); 
-    });
-
-    allQ.sort((a, b) => b.sortWeight - a.sortWeight);
-    return allQ.slice(0, 15).sort(() => 0.5 - Math.random()); // สลับลำดับอีกครั้งก่อนแสดง
-}
-
-// ==========================================
-// UI Functions
-// ==========================================
+// สุ่มดึงโจทย์ 15 ข้อจากคลัง 92 ข้อ ทุกครั้งที่กดเริ่ม
 function startQuiz() {
-    questions = getSessionQuestions();
+    let shuffledPool = shuffleArray(allGeneratedQuestions);
+    questions = shuffledPool.slice(0, 15);
+    wrongQuestions = [];
+    resetAndStart();
+}
+
+function startMistakesQuiz() {
+    questions = shuffleArray(wrongQuestions);
+    wrongQuestions = [];
+    resetAndStart();
+}
+
+function resetAndStart() {
     currentIndex = 0;
     score = 0;
-    updateProgressBar(0);
     document.getElementById('quiz-screen').style.display = 'block';
     document.getElementById('end-screen').style.display = 'none';
     showQuestion();
 }
 
-function updateProgressBar(answeredCount) {
-    const percentage = (answeredCount / questions.length) * 100;
-    document.getElementById('progress-fill').style.width = percentage + '%';
-}
-
 function showQuestion() {
     const q = questions[currentIndex];
-    hasFailedThisQuestion = false;
-    
     document.getElementById('part-title').innerText = q.part;
     document.getElementById('progress-text').innerText = `ข้อ ${currentIndex + 1} / ${questions.length}`;
     document.getElementById('question-text').innerText = q.q;
     
-    const area = document.getElementById('interactive-area');
     const feedback = document.getElementById('feedback');
     const checkBtn = document.getElementById('check-btn');
     const nextBtn = document.getElementById('next-btn');
     const audioBtn = document.getElementById('audio-btn');
+    const area = document.getElementById('interactive-area');
 
-    area.innerHTML = '';
     feedback.style.display = 'none';
     checkBtn.style.display = 'block';
-    checkBtn.disabled = false;
     nextBtn.style.display = 'none';
-    audioBtn.style.display = (q.type === 'listening') ? 'inline-flex' : 'none';
+    selectedChoiceIndex = null;
+    userSelectedSequence = [];
+    hasScoredThisQuestion = false;
+    hasFailedThisQuestion = false;
+    area.innerHTML = '';
+
+    if (q.type === 'listening') {
+        audioBtn.style.display = 'inline-flex';
+    } else {
+        audioBtn.style.display = 'none';
+    }
 
     if (q.type === 'choice' || q.type === 'listening') {
-        selectedChoiceIndex = null;
-        const optsDiv = document.createElement('div'); optsDiv.className = 'options';
+        const optsDiv = document.createElement('div');
+        optsDiv.className = 'options';
+        
         q.options.forEach((opt, idx) => {
-            const btn = document.createElement('button'); btn.className = 'option-btn';
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
             btn.innerText = opt;
-            btn.onclick = () => {
-                selectedChoiceIndex = idx;
-                document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
-            };
+            btn.onclick = () => selectChoiceOption(idx, btn);
             optsDiv.appendChild(btn);
         });
         area.appendChild(optsDiv);
-    } 
-    else if (q.type === 'unscramble') {
-        userSelectedSequence = [];
-        const ansZone = document.createElement('div'); ansZone.className = 'answer-zone'; ansZone.id = 'answer-zone';
-        const pool = document.createElement('div'); pool.className = 'word-pool'; pool.id = 'word-pool';
+    } else if (q.type === 'unscramble') {
+        const answerZone = document.createElement('div');
+        answerZone.className = 'answer-zone';
+        answerZone.id = 'answer-zone';
         
-        q.words.forEach(word => {
-            const chip = document.createElement('div'); chip.className = 'word-chip'; chip.innerText = word;
-            chip.onclick = () => {
-                if(chip.parentElement === pool) { ansZone.appendChild(chip); userSelectedSequence.push(word); speakText(word); }
-                else { pool.appendChild(chip); userSelectedSequence.splice(userSelectedSequence.indexOf(word), 1); }
-            };
-            pool.appendChild(chip);
-        });
-        area.appendChild(ansZone); area.appendChild(pool);
-    }
-    else if (q.type === 'matching') {
-        matchingState = { selectedJp: null, selectedTh: null, matchedPairs: 0, totalPairs: q.pairs.length };
-        checkBtn.style.display = 'none'; // ซ่อนปุ่มเช็ค สำหรับเกมจับคู่จะตรวจอัตโนมัติ
-        
-        const grid = document.createElement('div'); grid.className = 'matching-grid';
-        
-        let jpColumn = document.createElement('div'); jpColumn.style.display = 'flex'; jpColumn.style.flexDirection = 'column'; jpColumn.style.gap = '10px';
-        let thColumn = document.createElement('div'); thColumn.style.display = 'flex'; thColumn.style.flexDirection = 'column'; thColumn.style.gap = '10px';
+        const wordPool = document.createElement('div');
+        wordPool.className = 'word-pool';
+        wordPool.id = 'word-pool';
 
-        let jList = q.pairs.map(p => p.j).sort(() => 0.5 - Math.random());
-        let tList = q.pairs.map(p => p.t).sort(() => 0.5 - Math.random());
-
-        jList.forEach(text => {
-            let btn = document.createElement('div'); btn.className = 'match-btn jp-btn'; btn.innerText = text;
-            btn.onclick = () => handleMatchSelect(btn, text, 'jp', q.pairs);
-            jpColumn.appendChild(btn);
-        });
-        
-        tList.forEach(text => {
-            let btn = document.createElement('div'); btn.className = 'match-btn th-btn'; btn.innerText = text;
-            btn.onclick = () => handleMatchSelect(btn, text, 'th', q.pairs);
-            thColumn.appendChild(btn);
+        const shuffledWords = shuffleArray(q.words);
+        shuffledWords.forEach((word) => {
+            const chip = document.createElement('div');
+            chip.className = 'word-chip';
+            chip.innerText = word;
+            chip.onclick = () => toggleWordChip(chip, word);
+            wordPool.appendChild(chip);
         });
 
-        grid.appendChild(jpColumn); grid.appendChild(thColumn);
-        area.appendChild(grid);
+        area.appendChild(answerZone);
+        area.appendChild(wordPool);
     }
 }
 
-function handleMatchSelect(btn, text, type, pairsList) {
-    if(btn.classList.contains('matched')) return;
+function resetCheckState() {
+    document.getElementById('feedback').style.display = 'none';
+    document.getElementById('check-btn').style.display = 'block';
+    document.getElementById('next-btn').style.display = 'none';
+}
 
-    if(type === 'jp') {
-        document.querySelectorAll('.jp-btn').forEach(b => b.classList.remove('selected'));
-        matchingState.selectedJp = { btn, text };
-        speakText(text);
-    } else {
-        document.querySelectorAll('.th-btn').forEach(b => b.classList.remove('selected'));
-        matchingState.selectedTh = { btn, text };
-    }
+function selectChoiceOption(idx, btn) {
+    playSound('click');
+    resetCheckState();
+    selectedChoiceIndex = idx;
+    const allBtns = document.querySelectorAll('.option-btn');
+    allBtns.forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
+}
 
-    if(matchingState.selectedJp && matchingState.selectedTh) {
-        // Check match
-        const pair = pairsList.find(p => p.j === matchingState.selectedJp.text);
-        if(pair && pair.t === matchingState.selectedTh.text) {
-            matchingState.selectedJp.btn.className = 'match-btn jp-btn matched';
-            matchingState.selectedTh.btn.className = 'match-btn th-btn matched';
-            matchingState.matchedPairs++;
-            if(matchingState.matchedPairs === matchingState.totalPairs) {
-                // All matched
-                score++;
-                updateProgressBar(score);
-                document.getElementById('next-btn').style.display = 'block';
-                document.getElementById('feedback').className = 'feedback correct';
-                document.getElementById('feedback').innerHTML = `✅ <b>จับคู่ครบถ้วน ยอดเยี่ยมมาก!</b>`;
-                document.getElementById('feedback').style.display = 'block';
-            }
-        } else {
-            matchingState.selectedJp.btn.classList.remove('selected');
-            matchingState.selectedTh.btn.classList.remove('selected');
-            recordMistake(pair); // บันทึกว่าจำคู่นี้ไม่ได้
-        }
-        matchingState.selectedJp = null;
-        matchingState.selectedTh = null;
+function toggleWordChip(chip, word) {
+    playSound('click');
+    resetCheckState();
+    
+    const answerZone = document.getElementById('answer-zone');
+    const wordPool = document.getElementById('word-pool');
+
+    if (chip.parentElement === wordPool) {
+        speakJapaneseText(word);
+        answerZone.appendChild(chip);
+        userSelectedSequence.push(word);
+    } else {
+        wordPool.appendChild(chip);
+        const index = userSelectedSequence.indexOf(word);
+        if (index > -1) userSelectedSequence.splice(index, 1);
     }
 }
 
@@ -487,55 +632,91 @@ function checkAnswer() {
     let isCorrect = false;
 
     if (q.type === 'choice' || q.type === 'listening') {
-        if (selectedChoiceIndex === null) return;
-        isCorrect = (q.options[selectedChoiceIndex] === q.ansStr);
+        if (selectedChoiceIndex === null) {
+            alert('กรุณาเลือกคำตอบก่อนกดเช็คคำตอบครับ');
+            return;
+        }
+        isCorrect = (selectedChoiceIndex === q.ans);
     } else if (q.type === 'unscramble') {
-        if (userSelectedSequence.length === 0) return;
-        isCorrect = (userSelectedSequence.join('') === q.correctSeq.join(''));
+        if (userSelectedSequence.length === 0) {
+            alert('กรุณาเรียงประโยคก่อนกดเช็คคำตอบครับ');
+            return;
+        }
+        const userStr = userSelectedSequence.join('');
+        const correctStr = q.correctSeq.join('');
+        isCorrect = (userStr === correctStr);
     }
 
     const feedback = document.getElementById('feedback');
-    
+    const checkBtn = document.getElementById('check-btn');
+    const nextBtn = document.getElementById('next-btn');
+
     if (isCorrect) {
-        if(!hasFailedThisQuestion) { score++; updateProgressBar(score); }
+        playSound('correct');
+        
+        setTimeout(() => {
+            speakJapaneseText(q.ja);
+        }, 350);
+
+        if (!hasScoredThisQuestion && !hasFailedThisQuestion) {
+            score++;
+            hasScoredThisQuestion = true;
+        }
+
         feedback.className = 'feedback correct';
-        feedback.innerHTML = `✅ <b>ถูกต้อง!</b><br>🇯🇵 <b>${q.ja}</b> (${q.romaji})<br>🇹🇭 ${q.th}`;
-        document.getElementById('check-btn').style.display = 'none';
-        document.getElementById('next-btn').style.display = 'block';
-        speakText(q.ja);
+        feedback.innerHTML = `
+            ✅ <b>ถูกต้อง!</b><br>
+            🇯🇵 <b>คำตอบ:</b> ${q.ja}<br>
+            🗣️ <b>เสียงอ่าน (Romaji):</b> ${q.romaji}<br>
+            🇹🇭 <b>คำแปล:</b> ${q.th}
+        `;
+        checkBtn.style.display = 'none';
+        nextBtn.style.display = 'block';
     } else {
-        hasFailedThisQuestion = true;
-        recordMistake(q.vocabObj); // บันทึกข้อผิดพลาดลงระบบจำ
+        playSound('wrong');
+        
+        if (!hasFailedThisQuestion) {
+            wrongQuestions.push(q);
+            hasFailedThisQuestion = true;
+        }
+
         feedback.className = 'feedback wrong';
-        feedback.innerHTML = `❌ <b>ยังไม่ถูกต้อง ลองอีกครั้งนะครับ</b>`;
+        feedback.innerHTML = `❌ <b>ยังไม่ถูกต้อง! ลองเปลี่ยนคำตอบใหม่อีกครั้งนะครับ</b>`;
     }
+
     feedback.style.display = 'block';
 }
 
 function nextQuestion() {
+    playSound('click');
     currentIndex++;
-    if (currentIndex < questions.length) showQuestion();
-    else {
-        document.getElementById('quiz-screen').style.display = 'none';
-        document.getElementById('end-screen').style.display = 'block';
-        document.getElementById('final-score').innerText = score;
+    if (currentIndex < questions.length) {
+        showQuestion();
+    } else {
+        showEndScreen();
     }
 }
 
-function playQuestionAudio() {
-    if(questions[currentIndex].ja) speakText(questions[currentIndex].ja);
-}
-
-function speakText(text) {
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text.replace(/[。、]/g, ''));
-        utterance.lang = 'ja-JP'; utterance.rate = 0.9;
-        window.speechSynthesis.speak(utterance);
+function showEndScreen() {
+    document.getElementById('quiz-screen').style.display = 'none';
+    document.getElementById('end-screen').style.display = 'block';
+    
+    document.getElementById('final-score').innerText = score;
+    document.getElementById('total-score').innerText = questions.length;
+    
+    const retryBtn = document.getElementById('retry-mistakes-btn');
+    const wrongCountSpan = document.getElementById('wrong-count');
+    
+    if (wrongQuestions.length > 0) {
+        wrongCountSpan.innerText = wrongQuestions.length;
+        retryBtn.style.display = 'block';
+    } else {
+        retryBtn.style.display = 'none';
     }
 }
 
 window.onload = startQuiz;
 </script>
+
 </body>
 </html>
