@@ -6,10 +6,9 @@
     <title>แบบฝึกหัดภาษาญี่ปุ่น - ขั้นแอดวานซ์</title>
     <style>
         :root {
-            --primary: #58cc02; /* สีเขียวสไตล์ดูลิงโก้ */
+            --primary: #58cc02; 
             --primary-hover: #46a302;
             --bg: #ffffff;
-            --card: #ffffff;
             --text: #3c3c3c;
             --danger: #ff4b4b;
         }
@@ -46,16 +45,16 @@
             height: 100%;
             background: var(--primary);
             width: 0%;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            /* อนิเมชันหลอดเลือดวิ่ง */
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             border-radius: 10px;
             position: relative;
         }
 
-        /* เอฟเฟกต์แสงสะท้อนบนหลอดเลือดสไตล์เกม */
         .progress-bar::after {
             content: '';
             position: absolute;
-            top: 2px;
+            top: 3px;
             left: 5px;
             right: 5px;
             height: 4px;
@@ -81,10 +80,10 @@
             cursor: pointer;
             margin-bottom: 20px;
             font-weight: bold;
+            transition: transform 0.1s;
         }
         .audio-btn:active { border-bottom: 0px; transform: translateY(4px); }
 
-        /* ตัวเลือกทั่วไป */
         .options { display: flex; flex-direction: column; gap: 12px; }
         .option-btn {
             background: white;
@@ -95,16 +94,17 @@
             font-size: 1.1rem;
             text-align: left;
             cursor: pointer;
-            transition: all 0.1s;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .option-btn:hover { background: #f7f7f7; }
+        .option-btn:hover { background: #f7f7f7; transform: translateY(-2px); }
+        .option-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
         .option-btn.selected {
             border-color: #84d8ff;
             background: #ddf4ff;
             border-bottom-color: #38bdf8;
+            transform: scale(1.02);
         }
 
-        /* 2. ระบบจับคู่คำศัพท์ (Matching Grid) */
         .match-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -120,67 +120,89 @@
             cursor: pointer;
             user-select: none;
             background: white;
+            transition: all 0.2s;
         }
+        .match-item:hover { background: #f7f7f7; transform: translateY(-2px); }
+        .match-item:active { transform: translateY(2px); border-bottom-width: 2px; }
         .match-item.selected {
             border-color: #84d8ff;
             background: #ddf4ff;
             border-bottom-color: #38bdf8;
+            transform: scale(1.05);
         }
+        
+        /* อนิเมชันตอนจับคู่ถูก (Pop & Disappear) */
         .match-item.matched {
-            visibility: hidden;
+            animation: popOut 0.4s forwards;
             pointer-events: none;
         }
+        @keyframes popOut {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        /* อนิเมชันตอนจับคู่ผิด (สั่นแรงๆ) */
         .match-item.shake {
-            animation: shake 0.4s;
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
             border-color: var(--danger);
             background: #ffdfe0;
         }
-
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(3px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+            40%, 60% { transform: translate3d(5px, 0, 0); }
         }
 
         .action-btn-group { margin-top: 25px; }
-        .check-btn {
+        .check-btn, .next-btn {
             width: 100%;
-            background: var(--primary);
             color: white;
             border: none;
-            border-bottom: 4px solid var(--primary-hover);
             padding: 16px;
             border-radius: 16px;
             font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
+            transition: transform 0.1s;
         }
+        .check-btn { background: var(--primary); border-bottom: 4px solid var(--primary-hover); }
         .check-btn:active { border-bottom: 0px; transform: translateY(4px); }
-
-        .next-btn {
-            width: 100%;
-            background: #1cb0f6;
-            color: white;
-            border: none;
-            border-bottom: 4px solid #1899d6;
-            padding: 16px;
-            border-radius: 16px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: none;
-        }
+        
+        .next-btn { background: #1cb0f6; border-bottom: 4px solid #1899d6; display: none; }
         .next-btn:active { border-bottom: 0px; transform: translateY(4px); }
 
+        /* เอฟเฟกต์ตอบกลับเด้งดึ๋ง (Juicy Feedback) */
         .feedback {
             margin-top: 20px;
             padding: 20px;
             border-radius: 16px;
             display: none;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transform-origin: bottom center;
         }
-        .feedback.correct { background: #d7ffb8; color: #46a302; font-weight: bold; }
-        .feedback.wrong { background: #ffdfe0; color: #ea2b2b; font-weight: bold; }
+        
+        .feedback.show {
+            display: block;
+            animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.5) translateY(20px); opacity: 0; }
+            50% { transform: scale(1.05) translateY(-5px); opacity: 1; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .feedback.correct { background: #d7ffb8; color: #46a302; border: 2px solid #b8f28b; }
+        .feedback.wrong { background: #ffdfe0; color: #ea2b2b; border: 2px solid #ffb3b8; }
+        
+        .feedback-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -197,7 +219,10 @@
             <div id="interactive-area"></div>
         </div>
 
-        <div id="feedback" class="feedback"></div>
+        <div id="feedback" class="feedback">
+            <span id="feedback-icon" class="feedback-icon"></span>
+            <span id="feedback-text"></span>
+        </div>
 
         <div class="action-btn-group">
             <button id="check-btn" class="check-btn" onclick="checkAnswer()">ตรวจคำตอบ</button>
@@ -207,9 +232,6 @@
 </div>
 
 <script>
-// ----------------------------------------------------
-// ระบบคลังคำศัพท์ (เพิ่มคำที่นี่ในอนาคตได้เลย ระบบจะสร้างโจทย์ออโต้)
-// ----------------------------------------------------
 const dictionary = [
     { j: 'ごはん', t: 'ข้าว', r: 'Gohan' },
     { j: 'みず', t: 'น้ำ', r: 'Mizu' },
@@ -221,86 +243,44 @@ const dictionary = [
     { j: 'くるま', t: 'รถยนต์', r: 'Kuruma' }
 ];
 
-// ----------------------------------------------------
-// ระบบสร้างโจทย์อัตโนมัติ
-// ----------------------------------------------------
 let allQuestions = [];
 let idCounter = 1;
 
-// 1. สร้างโจทย์จับคู่คำศัพท์ (Matching)
 for (let i = 0; i < dictionary.length; i += 4) {
     if(i + 4 <= dictionary.length) {
-        let chunk = dictionary.slice(i, i+4);
         allQuestions.push({
-            id: 'match_' + idCounter++,
-            type: 'matching',
-            q: 'จับคู่คำศัพท์ให้ถูกต้อง',
-            pairs: chunk
+            id: 'match_' + idCounter++, type: 'matching', q: 'จับคู่คำศัพท์ให้ถูกต้อง', pairs: dictionary.slice(i, i+4)
         });
     }
 }
 
-// 2. สร้างโจทย์อ่าน แปล และฟัง
 dictionary.forEach(word => {
     let wrongTh = dictionary.filter(d => d.t !== word.t).sort(() => 0.5 - Math.random()).map(d => d.t).slice(0, 3);
     wrongTh.push(word.t);
-    
-    allQuestions.push({
-        id: 'vocab_ja_th_' + idCounter++,
-        type: 'choice',
-        q: `คำแปลของ "${word.j}" คือข้อใด?`,
-        options: wrongTh.sort(() => 0.5 - Math.random()),
-        ans: word.t, ja: word.j, th: word.t
-    });
-
-    allQuestions.push({
-        id: 'listen_' + idCounter++,
-        type: 'listening',
-        q: '🔊 ฟังเสียงแล้วเลือกคำแปลที่ตรงกัน',
-        audioText: word.j,
-        options: wrongTh.sort(() => 0.5 - Math.random()),
-        ans: word.t, ja: word.j, th: word.t
-    });
+    allQuestions.push({ id: 'vocab_ja_th_' + idCounter++, type: 'choice', q: `คำแปลของ "${word.j}" คือข้อใด?`, options: wrongTh.sort(() => 0.5 - Math.random()), ans: word.t, ja: word.j, th: word.t });
 });
 
-// ----------------------------------------------------
-// ระบบ Spaced Repetition (จำข้อที่ผิดบ่อยดึงมาออกซ้ำ)
-// ----------------------------------------------------
-function getMistakeStats() {
-    return JSON.parse(localStorage.getItem('spacedRepetitionStats') || '{}');
-}
-
+function getMistakeStats() { return JSON.parse(localStorage.getItem('spacedRepetitionStats') || '{}'); }
 function recordMistake(questionId) {
     let stats = getMistakeStats();
     stats[questionId] = (stats[questionId] || 0) + 1;
     localStorage.setItem('spacedRepetitionStats', JSON.stringify(stats));
 }
 
-function selectQuestionsForSession(poolSize = 15) {
+function selectQuestionsForSession(poolSize = 10) {
     let stats = getMistakeStats();
-    // เรียงโจทย์: ข้อที่ผิดบ่อยให้อยู่บนสุด, ถ้ายอดผิดเท่ากันให้สุ่ม (เพื่อให้เกิดความคละเคล้า)
-    let sortedQuestions = [...allQuestions].sort((a, b) => {
-        let weightA = (stats[a.id] || 0) + Math.random();
-        let weightB = (stats[b.id] || 0) + Math.random();
-        return weightB - weightA; 
-    });
-    return sortedQuestions.slice(0, poolSize);
+    let sorted = [...allQuestions].sort((a, b) => ((stats[b.id] || 0) + Math.random()) - ((stats[a.id] || 0) + Math.random()));
+    return sorted.slice(0, poolSize);
 }
 
-// ----------------------------------------------------
-// กลไกการทำแบบทดสอบ
-// ----------------------------------------------------
 let currentSessionQs = [];
 let currentIndex = 0;
-let score = 0;
 let userSelection = null;
-
-// สำหรับเกมจับคู่
 let matchPairsLeft = 0;
 let selectedMatchBtn = null;
 
 function startSession() {
-    currentSessionQs = selectQuestionsForSession(10); // ทดสอบดึงมา 10 ข้อต่อรอบ
+    currentSessionQs = selectQuestionsForSession(10);
     currentIndex = 0;
     updateProgress(0);
     showQuestion();
@@ -317,18 +297,13 @@ function showQuestion() {
     const area = document.getElementById('interactive-area');
     area.innerHTML = '';
     
-    document.getElementById('feedback').style.display = 'none';
+    // รีเซ็ตแอนิเมชันเฉลย
+    const fb = document.getElementById('feedback');
+    fb.classList.remove('show', 'correct', 'wrong');
+    fb.style.display = 'none';
     
-    // จัดการปุ่ม Check / Next
-    const checkBtn = document.getElementById('check-btn');
-    if (q.type === 'matching') {
-        checkBtn.style.display = 'none'; // เกมจับคู่ตรวจแบบเรียลไทม์
-    } else {
-        checkBtn.style.display = 'block';
-    }
+    document.getElementById('check-btn').style.display = (q.type === 'matching') ? 'none' : 'block';
     document.getElementById('next-btn').style.display = 'none';
-    document.getElementById('audio-btn').style.display = (q.type === 'listening') ? 'block' : 'none';
-
     userSelection = null;
 
     if (q.type === 'choice' || q.type === 'listening') {
@@ -347,9 +322,7 @@ function showQuestion() {
         });
         area.appendChild(optsDiv);
     } 
-    else if (q.type === 'matching') {
-        renderMatchingGame(q.pairs, area);
-    }
+    else if (q.type === 'matching') { renderMatchingGame(q.pairs, area); }
 }
 
 function renderMatchingGame(pairs, container) {
@@ -361,10 +334,9 @@ function renderMatchingGame(pairs, container) {
     let items = [];
     pairs.forEach(p => {
         items.push({ text: p.j, matchId: p.j, lang: 'ja' });
-        items.push({ text: p.t, matchId: p.j, lang: 'th' }); // ใช้คำญี่ปุ่นเป็น ID จับคู่
+        items.push({ text: p.t, matchId: p.j, lang: 'th' });
     });
-    
-    items.sort(() => 0.5 - Math.random()); // สับไพ่กระจุย
+    items.sort(() => 0.5 - Math.random());
 
     items.forEach(item => {
         const btn = document.createElement('div');
@@ -372,8 +344,7 @@ function renderMatchingGame(pairs, container) {
         btn.innerText = item.text;
         btn.dataset.id = item.matchId;
         btn.dataset.lang = item.lang;
-        
-        btn.onclick = () => handleMatchClick(btn, q);
+        btn.onclick = () => handleMatchClick(btn);
         grid.appendChild(btn);
     });
     container.appendChild(grid);
@@ -386,29 +357,25 @@ function handleMatchClick(btn) {
         btn.classList.add('selected');
         selectedMatchBtn = btn;
     } else {
-        // กดปุ่มที่สอง ทำการเช็ค
         if (selectedMatchBtn.dataset.lang !== btn.dataset.lang && selectedMatchBtn.dataset.id === btn.dataset.id) {
-            // จับคู่ถูก
             btn.classList.add('matched');
             selectedMatchBtn.classList.add('matched');
             selectedMatchBtn = null;
             matchPairsLeft--;
-            
             if (matchPairsLeft === 0) {
-                // จบเกมจับคู่
                 updateProgress(currentIndex + 1);
                 document.getElementById('next-btn').style.display = 'block';
-                showFeedback(true, "ยอดเยี่ยม! จับคู่ครบทั้งหมดแล้ว");
+                showFeedback(true, "ยอดเยี่ยม! จับคู่ครบทั้งหมดแล้ว", "🎉");
             }
         } else {
-            // จับคู่ผิด
             recordMistake(currentSessionQs[currentIndex].id);
             btn.classList.add('shake');
             selectedMatchBtn.classList.add('shake');
+            let tempBtn = selectedMatchBtn;
+            selectedMatchBtn = null;
             setTimeout(() => {
                 btn.classList.remove('shake');
-                selectedMatchBtn.classList.remove('shake', 'selected');
-                selectedMatchBtn = null;
+                tempBtn.classList.remove('shake', 'selected');
             }, 400);
         }
     }
@@ -416,37 +383,36 @@ function handleMatchClick(btn) {
 
 function checkAnswer() {
     const q = currentSessionQs[currentIndex];
-    
     if (!userSelection) return alert("กรุณาเลือกคำตอบครับ!");
-
     const isCorrect = (userSelection === q.ans);
     
     if (isCorrect) {
         updateProgress(currentIndex + 1);
         document.getElementById('check-btn').style.display = 'none';
         document.getElementById('next-btn').style.display = 'block';
-        showFeedback(true, `ถูกกต้อง! ${q.ja} แปลว่า ${q.th}`);
+        showFeedback(true, `ถูกต้อง! ${q.ja} แปลว่า ${q.th}`, "🥳");
     } else {
-        recordMistake(q.id); // บันทึกลง Spaced Repetition (localStorage)
-        showFeedback(false, "ยังไม่ใช่ ลองเลือกคำตอบอื่นดูนะ");
+        recordMistake(q.id);
+        showFeedback(false, "ยังไม่ใช่ ลองเลือกคำตอบอื่นดูนะ", "😅");
     }
 }
 
-function showFeedback(isCorrect, text) {
+function showFeedback(isCorrect, text, emoji) {
     const fb = document.getElementById('feedback');
-    fb.style.display = 'block';
-    fb.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
-    fb.innerText = text;
+    fb.classList.remove('show', 'correct', 'wrong'); // ล้างแอนิเมชันเดิมออกก่อน
+    
+    // บังคับให้เบราว์เซอร์รีเฟรช DOM เพื่อให้แอนิเมชันเล่นซ้ำได้
+    void fb.offsetWidth; 
+    
+    document.getElementById('feedback-icon').innerText = emoji;
+    document.getElementById('feedback-text').innerText = text;
+    fb.classList.add(isCorrect ? 'correct' : 'wrong', 'show');
 }
 
 function nextQuestion() {
     currentIndex++;
-    if (currentIndex < currentSessionQs.length) {
-        showQuestion();
-    } else {
-        alert("ยินดีด้วย! คุณเรียนจบเซ็ตนี้แล้ว 🎉");
-        startSession(); // วนลูปเริ่มใหม่ (มันจะดึงข้อที่เราทำผิดบ่อยในเซ็ตนี้มาออกซ้ำในรอบหน้า)
-    }
+    if (currentIndex < currentSessionQs.length) { showQuestion(); } 
+    else { alert("ยินดีด้วย! คุณเรียนจบเซ็ตนี้แล้ว 🎉"); startSession(); }
 }
 
 window.onload = startSession;
