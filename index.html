@@ -33,7 +33,7 @@
             box-sizing: border-box;
         }
 
-        /* ----- Progress Bar & Combo Style ปรับไล่สี เขียว -> ส้ม -> แดง ----- */
+        /* ----- Progress Bar & Combo Style ----- */
         .progress-header {
             display: flex;
             justify-content: space-between;
@@ -62,20 +62,20 @@
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease, box-shadow 0.4s ease;
         }
 
-        /* ระดับสี Combo ตามจำนวนสะสม */
+        /* ระดับสี Combo (เขียว -> ส้ม -> แดง) */
         .progress-bar.combo-green {
             background: #10b981;
-            box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
         }
 
         .progress-bar.combo-orange {
             background: #f97316;
-            box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+            box-shadow: 0 0 12px rgba(249, 115, 22, 0.5);
         }
 
         .progress-bar.combo-red {
             background: #ef4444;
-            box-shadow: 0 0 14px rgba(239, 68, 68, 0.5);
+            box-shadow: 0 0 16px rgba(239, 68, 68, 0.7);
         }
 
         .combo-badge {
@@ -88,11 +88,11 @@
 
         .combo-text {
             font-size: 0.95rem;
-            font-weight: 700;
+            font-weight: 800;
             color: #64748b;
             background: #f1f5f9;
             border: 1px solid #e2e8f0;
-            padding: 4px 12px;
+            padding: 4px 14px;
             border-radius: 20px;
             opacity: 0;
             transform: translateY(-4px);
@@ -104,14 +104,16 @@
             transform: translateY(0);
         }
 
-        /* สไตล์ข้อความ Combo เปลี่ยนสีตามระดับ */
         .combo-text.text-green { color: #059669; background: #ecfdf5; border-color: #a7f3d0; }
         .combo-text.text-orange { color: #ea580c; background: #fff7ed; border-color: #ffedd5; }
-        .combo-text.text-red { color: #dc2626; background: #fef2f2; border-color: #fecaca; animation: pulse-glow 1.2s ease-in-out infinite alternate; }
+        .combo-text.text-red { 
+            color: #dc2626; background: #fef2f2; border-color: #fecaca; 
+            animation: pulse-glow 0.8s ease-in-out infinite alternate; 
+        }
 
         @keyframes pulse-glow {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); }
-            100% { transform: scale(1.05); box-shadow: 0 0 8px 2px rgba(239, 68, 68, 0.3); }
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3); }
+            100% { transform: scale(1.08); box-shadow: 0 0 10px 3px rgba(239, 68, 68, 0.4); }
         }
 
         .header {
@@ -248,34 +250,78 @@
 <script>
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-function playSound(type) {
+/* ----- ระบบเสียงสังเคราะห์สไตล์ Arcade/เกมการต่อสู้ ดุดัน ----- */
+function playSound(type, comboLevel = 0) {
     if (audioCtx.state === 'suspended') audioCtx.resume();
     const now = audioCtx.currentTime;
+
     if (type === 'click') {
-        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+        const osc = audioCtx.createOscillator(); 
+        const gain = audioCtx.createGain();
         osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.type = 'sine'; osc.frequency.setValueAtTime(700, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.04);
-        gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
-        osc.start(now); osc.stop(now + 0.04);
+        osc.type = 'triangle'; 
+        osc.frequency.setValueAtTime(600, now); 
+        osc.frequency.exponentialRampToValueAtTime(200, now + 0.05);
+        gain.gain.setValueAtTime(0.12, now); 
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+        osc.start(now); osc.stop(now + 0.05);
     } 
     else if (type === 'correct') {
-        const notes = [523.25, 659.25, 783.99, 1046.50];
+        // เพิ่มความดุดันและทรงพลังตามระดับ Combo
+        let pitchMultiplier = 1 + Math.min(comboLevel * 0.08, 0.6); // ยิ่งคอมโบเยอะ พิตช์ยิ่งสูง
+        
+        // 1. เสียง Impact/Sub-bass หนักแน่น
+        const bassOsc = audioCtx.createOscillator();
+        const bassGain = audioCtx.createGain();
+        bassOsc.connect(bassGain); bassGain.connect(audioCtx.destination);
+        bassOsc.type = 'sawtooth';
+        bassOsc.frequency.setValueAtTime(120 * pitchMultiplier, now);
+        bassOsc.frequency.exponentialRampToValueAtTime(40, now + 0.25);
+        bassGain.gain.setValueAtTime(0.3, now);
+        bassGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        bassOsc.start(now); bassOsc.stop(now + 0.25);
+
+        // 2. เสียง อาเคด Arpeggio เร็วสไตล์เกมยุค 90s
+        const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+        const stepTime = comboLevel >= 8 ? 0.04 : (comboLevel >= 5 ? 0.05 : 0.07);
+        
         notes.forEach((freq, idx) => {
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            const osc = audioCtx.createOscillator(); 
+            const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = 'sine'; osc.frequency.setValueAtTime(freq, now + idx * 0.08);
-            gain.gain.setValueAtTime(0.2, now + idx * 0.08); gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.3);
-            osc.start(now + idx * 0.08); osc.stop(now + idx * 0.08 + 0.3);
+            
+            // โทนเสียง Sawtooth สไตล์ synth เกมตู้
+            osc.type = comboLevel >= 5 ? 'sawtooth' : 'square'; 
+            osc.frequency.setValueAtTime(freq * pitchMultiplier, now + idx * stepTime);
+            
+            gain.gain.setValueAtTime(0.15, now + idx * stepTime); 
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * stepTime + 0.25);
+            
+            osc.start(now + idx * stepTime); 
+            osc.stop(now + idx * stepTime + 0.25);
         });
     } 
     else if (type === 'wrong') {
-        [0, 0.15].forEach(delay => {
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now + delay);
-            gain.gain.setValueAtTime(0.2, now + delay); gain.gain.exponentialRampToValueAtTime(0.01, now + delay + 0.15);
-            osc.start(now + delay); osc.stop(now + delay + 0.15);
-        });
+        // เสียง Combo Break ดุดันแบบเกมต่อสู้ (Buzzing Heavy Impact)
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc1.connect(gain); osc2.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc1.type = 'sawtooth'; osc2.type = 'sawtooth';
+        osc1.frequency.setValueAtTime(160, now);
+        osc1.frequency.exponentialRampToValueAtTime(40, now + 0.35);
+        
+        osc2.frequency.setValueAtTime(116, now); // เกิดเสียงก้องหนาแบบ Discordant
+        osc2.frequency.exponentialRampToValueAtTime(30, now + 0.35);
+
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+        osc1.start(now); osc2.start(now);
+        osc1.stop(now + 0.35); osc2.stop(now + 0.35);
     }
 }
 
@@ -387,11 +433,9 @@ function updateProgressBar() {
     document.getElementById('gauge-counter').innerText = `${currentIndex} / ${total}`;
     bar.style.width = pct + '%';
 
-    // เคลียร์คลาสเดิมออก
     bar.classList.remove('combo-green', 'combo-orange', 'combo-red');
     comboTxt.classList.remove('active', 'text-green', 'text-orange', 'text-red');
 
-    // ปรับเปลี่ยนสีตามระดับ Combo (เขียว -> ส้ม -> แดง)
     if (combo >= 8) {
         bar.classList.add('combo-red');
         comboTxt.innerText = `🔥 Combo x${combo}! (MAX)`;
@@ -451,13 +495,13 @@ function showQuestion() {
             chip.onclick = () => {
                 playSound('click');
 
-                // อ่านเสียงเฉพาะตอน "ย้ายเข้าช่องตอบ" (จาก Pool -> Zone) เท่านั้น
+                // อ่านเสียงภาษาญี่ปุ่นเฉพาะตอนกดเลือกเข้าช่องตอบ (Pool -> Zone)
                 if (chip.parentElement === wordPool) {
                     speakJapaneseText(word);
                     answerZone.appendChild(chip); 
                     userSelectedSequence.push(word);
                 } else {
-                    // เอากลับเข้าช่องเดิม: ไม่มีการสะกดคำ เล่นแค่เสียงคลิก
+                    // เอากลับเข้าที่เดิม: ไม่มีการสะกดคำ
                     wordPool.appendChild(chip);
                     const idx = userSelectedSequence.indexOf(word);
                     if (idx > -1) userSelectedSequence.splice(idx, 1);
@@ -505,13 +549,15 @@ function handleMatchSelect(el, item, q) {
 
     if (matchSelectedLeft && matchSelectedRight) {
         if (matchSelectedLeft.item.id === matchSelectedRight.item.id) {
-            playSound('correct');
+            if (!hasFailedThisQuestion) { combo++; }
+            playSound('correct', combo); // ส่งระดับ Combo ไปประมวลผลเสียงดุดัน
+            
             matchSelectedLeft.el.classList.remove('selected'); matchSelectedRight.el.classList.remove('selected');
             matchSelectedLeft.el.classList.add('matched'); matchSelectedRight.el.classList.add('matched');
             matchedPairs++; matchSelectedLeft = null; matchSelectedRight = null;
             
             if (matchedPairs === q.pairs.length) {
-                if (!hasFailedThisQuestion) { score++; combo++; }
+                if (!hasFailedThisQuestion) { score++; }
                 updateProgressBar();
                 document.getElementById('feedback').className = 'feedback correct';
                 document.getElementById('feedback').innerHTML = `✅ <b>จับคู่ถูกต้องครบถ้วน!</b>`;
@@ -556,9 +602,10 @@ function checkAnswer() {
 
     const feedback = document.getElementById('feedback');
     if (isCorrect) {
-        playSound('correct');
-        if (!q.noSound) setTimeout(() => speakJapaneseText(q.ja), 50);
         if (!hasFailedThisQuestion) { score++; combo++; }
+        playSound('correct', combo); // เล่นเสียงตอบถูกพร้อมระดับพลัง Combo
+        
+        if (!q.noSound) setTimeout(() => speakJapaneseText(q.ja), 50);
         
         updateProgressBar();
         feedback.className = 'feedback correct';
