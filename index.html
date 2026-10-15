@@ -347,4 +347,236 @@ function playSound(type) {
     }
 }
 
-// คลังข้อมูลแบบฝึกหัด
+// คลังข้อมูลแบบฝึกหัด 30 ข้อ (พร้อมเฉลยรายละเอียด 3 ภาษา)
+const rawQuestions = [
+    // Part 1: Choice (1-6)
+    { type: 'choice', part: 'Part 1: Choice', q: '"Rice and water, please!"', options: ['ごはんとすし、ください！', 'ごはんとみず、ください！', 'みずとすし、ください！'], ans: 1, ja: 'ごはんとみず、ください！', romaji: 'Gohan to mizu, kudasai!', th: 'ขอข้าวและน้ำหน่อยครับ/ค่ะ' },
+    { type: 'choice', part: 'Part 1: Choice', q: '"It\'s green tea."', options: ['おちゃです。', 'ごはんです。', 'すしです。'], ans: 0, ja: 'おちゃです。', romaji: 'Ocha desu.', th: 'คือชาเขียวครับ/ค่ะ' },
+    { type: 'choice', part: 'Part 1: Choice', q: '"Sushi and green tea, please."', options: ['すしとおちゃ、ください。', 'みずとおちゃ、ください。', 'ごはんとおちゃ、ください。'], ans: 0, ja: 'すしとおちゃ、ください。', romaji: 'Sushi to ocha, kudasai.', th: 'ขอซูชิและชาเขียวครับ/ค่ะ' },
+    { type: 'choice', part: 'Part 1: Choice', q: '"Water and sushi, please."', options: ['すしとみず、ください。', 'みずとすし、ください。', 'ごはんとすし、ください。'], ans: 1, ja: 'みずとすし、ください。', romaji: 'Mizu to sushi, kudasai.', th: 'ขอน้ำและซูชิครับ/ค่ะ' },
+    { type: 'choice', part: 'Part 1: Choice', q: '"It\'s rice."', options: ['みずです。', 'おちゃです。', 'ごはんです。'], ans: 2, ja: 'ごはんです。', romaji: 'Gohan desu.', th: 'คือข้าวครับ/ค่ะ' },
+    { type: 'choice', part: 'Part 1: Choice', q: 'What is "Water" in Japanese?', options: ['ごはん', 'みず', 'おちゃ'], ans: 1, ja: 'みず', romaji: 'Mizu', th: 'น้ำ' },
+
+    // Part 2: Listening (7-18)
+    { type: 'listening', part: 'Part 2: Listening', q: '🔊 ฟังเสียงแล้วเลือกความหมายที่ถูกต้อง', audioText: 'ごはんとみず、ください！', options: ['Rice and green tea, please!', 'Rice and water, please!', 'Water and sushi, please!'], ans: 1, ja: 'ごはんとみず、ください！', romaji: 'Gohan to mizu, kudasai!', th: 'ขอข้าวและน้ำหน่อยครับ/ค่ะ' },
+    { type: 'listening', part: 'Part 2: Listening', q: '🔊 ฟังเสียงแล้วเลือกความหมายที่ถูกต้อง', audioText: 'おちゃです。', options: ['It\'s rice.', 'It\'s green tea.', 'It\'s sushi.'], ans: 1, ja: 'おちゃです。', romaji: 'Ocha desu.', th: 'คือชาเขียวครับ/ค่ะ' },
+    { type: 'listening', part: 'Part 2: Listening', q: '🔊 ฟังเสียงแล้วเลือกความหมายที่ถูกต้อง', audioText: 'すしとおちゃ、ください。', options: ['Sushi and green tea, please.', 'Rice and green tea, please.', 'Water and sushi, please.'], ans: 0, ja: 'すしとおちゃ、ください。', romaji: 'Sushi to ocha, kudasai.', th: 'ขอซูชิและชาเขียวครับ/ค่ะ' },
+    { type: 'listening', part: 'Part 2: Listening', q: '🔊 ฟังเสียงแล้วเลือกความหมายที่ถูกต้อง', audioText: 'みずとすし、ください。', options: ['Water and sushi, please.', 'Sushi and green tea, please.', 'Rice and water, please.'], ans: 0, ja: 'みずとすし、ください。', romaji: 'Mizu to sushi, kudasai.', th: 'ขอน้ำและซูชิครับ/ค่ะ' },
+    { type: 'listening', part: 'Part 2: Listening', q: '🔊 ฟังเสียงแล้วเลือกความหมายที่ถูกต้อง', audioText: 'ごはんです。', options: ['It\'s green tea.', 'It\'s rice.', 'It\'s water.'], ans: 1, ja: 'ごはんです。', romaji: 'Gohan desu.', th: 'คือข้าวครับ/ค่ะ' },
+    { type: 'listening', part: 'Part 2: Listening', q: '🔊 ฟังเสียงแล้วเลือกความหมายที่ถูกต้อง', audioText: 'すしです。', options: ['It\'s sushi.', 'It\'s rice.', 'It\'s water.'], ans: 0, ja: 'すしです。', romaji: 'Sushi desu.', th: 'คือซูชิครับ/ค่ะ' },
+    { type: 'listening', part: 'Part 2: Listening', q: '🔊 ฟังเสียงแล้วเลือกความหมายที่ถูกต้อง', audioText: 'みず', options: ['みず (Water)', 'ごはん (Rice)', 'おちゃ (Green tea)'], ans: 0, ja: 'みず', romaji: 'Mizu', th: 'น้ำ' },
+    { type: 'listening', part: 'Part 2: Listening', q: '🔊 ฟังเสียงแล้วเลือกความหมายที่ถูกต้อง', audioText: 'おちゃ', options: ['すし (Sushi)', 'おちゃ (Green tea)', 'みず (Water)'], ans: 1, ja: 'おちゃ', romaji: 'Ocha', th: 'ชาเขียว' },
+    { type: 'listening', part: 'Part 2: Listening', q: '🔊 ฟังเสียงแล้วเลือกความหมายที่ถูกต้อง', audioText: 'ごはん', options: ['ごはん (Rice)', 'みず (Water)', 'おちゃ (Green tea)'], ans: 0, ja: 'ごはん', romaji: 'Gohan', th: 'ข้าว' },
+    { type: 'listening', part: 'Part 2: Listening', q: '🔊 ฟังเสียงแล้วเลือกความหมายที่ถูกต้อง', audioText: 'みずとおちゃ、ください。', options: ['Water and green tea, please.', 'Rice and water, please.', 'Sushi and water, please.'], ans: 0, ja: 'みずとおちゃ、ください。', romaji: 'Mizu to ocha, kudasai.', th: 'ขอน้ำและชาเขียวครับ/ค่ะ' },
+    { type: 'listening', part: 'Part 2: Listening', q: '🔊 ฟังเสียงแล้วเลือกความหมายที่ถูกต้อง', audioText: 'ごはんとおちゃ、ください。', options: ['Rice and green tea, please.', 'Sushi and green tea, please.', 'Water and sushi, please.'], ans: 0, ja: 'ごはんとおちゃ、ください。', romaji: 'Gohan to ocha, kudasai.', th: 'ขอข้าวและชาเขียวครับ/ค่ะ' },
+    { type: 'listening', part: 'Part 2: Listening', q: '🔊 ฟังเสียงแล้วเลือกความหมายที่ถูกต้อง', audioText: 'みずです。', options: ['It\'s water.', 'It\'s rice.', 'It\'s green tea.'], ans: 0, ja: 'みずです。', romaji: 'Mizu desu.', th: 'คือน้ำครับ/ค่ะ' },
+
+    // Part 3: Unscramble with 2 Distractors (19-30)
+    { type: 'unscramble', part: 'Part 3: Unscramble', q: 'เรียงคำให้ถูกต้อง: "Rice and water, please!"', words: ['ごはん', 'ください！', 'おちゃ', 'です', 'と', 'みず、'], correctSeq: ['ごはん', 'と', 'みず、', 'ください！'], ja: 'ごはんとみず、ください！', romaji: 'Gohan to mizu, kudasai!', th: 'ขอข้าวและน้ำหน่อยครับ/ค่ะ' },
+    { type: 'unscramble', part: 'Part 3: Unscramble', q: 'เรียงคำให้ถูกต้อง: "It\'s green tea."', words: ['です。', 'ごはん', 'おちゃ', 'と', 'ください'], correctSeq: ['おちゃ', 'です。'], ja: 'おちゃです。', romaji: 'Ocha desu.', th: 'คือชาเขียวครับ/ค่ะ' },
+    { type: 'unscramble', part: 'Part 3: Unscramble', q: 'เรียงคำให้ถูกต้อง: "Sushi and green tea, please."', words: ['ください。', 'と', 'みず', 'すし', 'です', 'おちゃ、'], correctSeq: ['すし', 'と', 'おちゃ、', 'ください。'], ja: 'すしとおちゃ、ください。', romaji: 'Sushi to ocha, kudasai.', th: 'ขอซูชิและชาเขียวครับ/ค่ะ' },
+    { type: 'unscramble', part: 'Part 3: Unscramble', q: 'เรียงคำให้ถูกต้อง: "Water and sushi, please."', words: ['すし、', 'ごはん', 'みず', 'おちゃ', 'と', 'ください。'], correctSeq: ['みず', 'と', 'すし、', 'ください。'], ja: 'みずとすし、ください。', romaji: 'Mizu to sushi, kudasai.', th: 'ขอน้ำและซูชิครับ/ค่ะ' },
+    { type: 'unscramble', part: 'Part 3: Unscramble', q: 'เรียงคำให้ถูกต้อง: "It\'s rice."', words: ['です。', 'ごはん', 'ください', 'みず', 'と'], correctSeq: ['ごはん', 'です。'], ja: 'ごはんです。', romaji: 'Gohan desu.', th: 'คือข้าวครับ/ค่ะ' },
+    { type: 'unscramble', part: 'Part 3: Unscramble', q: 'เรียงคำให้ถูกต้อง: "It\'s sushi."', words: ['おちゃ', 'です。', 'すし', 'ごはん', 'ください'], correctSeq: ['すし', 'です。'], ja: 'すしです。', romaji: 'Sushi desu.', th: 'คือซูชิครับ/ค่ะ' },
+    { type: 'unscramble', part: 'Part 3: Unscramble', q: 'เรียงคำให้ถูกต้อง: "Green tea and water, please."', words: ['と', 'みず、', 'すし', 'ごはん', 'おちゃ', 'ください。'], correctSeq: ['おちゃ', 'と', 'みず、', 'ください。'], ja: 'おちゃとみず、ください。', romaji: 'Ocha to mizu, kudasai.', th: 'ขอชาเขียวและน้ำครับ/ค่ะ' },
+    { type: 'unscramble', part: 'Part 3: Unscramble', q: 'เรียงคำให้ถูกต้อง: "It\'s water."', words: ['みず', 'です。', 'と', 'ください', 'すし'], correctSeq: ['みず', 'です。'], ja: 'みずです。', romaji: 'Mizu desu.', th: 'คือน้ำครับ/ค่ะ' },
+    { type: 'unscramble', part: 'Part 3: Unscramble', q: 'เรียงคำให้ถูกต้อง: "Rice and sushi, please."', words: ['すし、', 'ください。', 'ごはん', 'おちゃ', 'です', 'と'], correctSeq: ['ごはん', 'と', 'すし、', 'ください。'], ja: 'ごはんとすし、ください。', romaji: 'Gohan to sushi, kudasai.', th: 'ขอข้าวและซูชิครับ/ค่ะ' },
+    { type: 'unscramble', part: 'Part 3: Unscramble', q: 'เรียงคำให้ถูกต้อง: "Sushi, please."', words: ['です', 'すし、', 'と', 'おちゃ', 'ください。'], correctSeq: ['すし、', 'ください。'], ja: 'すし、ください。', romaji: 'Sushi, kudasai.', th: 'ขอซูชิครับ/ค่ะ' },
+    { type: 'unscramble', part: 'Part 3: Unscramble', q: 'เรียงคำให้ถูกต้อง: "Water, please."', words: ['みず、', 'と', 'ください。', 'です', 'ごはん'], correctSeq: ['みず、', 'ください。'], ja: 'みず、ください。', romaji: 'Mizu, kudasai.', th: 'ขอน้ำครับ/ค่ะ' },
+    { type: 'unscramble', part: 'Part 3: Unscramble', q: 'เรียงคำให้ถูกต้อง: "Green tea, please."', words: ['おちゃ、', 'ください。', 'ごはん', 'と', 'すし'], correctSeq: ['おちゃ、', 'ください。'], ja: 'おちゃ、ください。', romaji: 'Ocha, kudasai.', th: 'ขอชาเขียวครับ/ค่ะ' }
+];
+
+let questions = [];
+let currentIndex = 0;
+let score = 0;
+let selectedChoiceIndex = null;
+let userSelectedSequence = [];
+
+function shuffleArray(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function playQuestionAudio() {
+    const q = questions[currentIndex];
+    if (q.type === 'listening' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(q.audioText);
+        utterance.lang = 'ja-JP';
+        utterance.rate = 0.85;
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
+function startQuiz() {
+    questions = shuffleArray(rawQuestions);
+    currentIndex = 0;
+    score = 0;
+    document.getElementById('quiz-screen').style.display = 'block';
+    document.getElementById('end-screen').style.display = 'none';
+    showQuestion();
+}
+
+function showQuestion() {
+    const q = questions[currentIndex];
+    document.getElementById('part-title').innerText = q.part;
+    document.getElementById('progress-text').innerText = `ข้อ ${currentIndex + 1} / ${questions.length}`;
+    document.getElementById('question-text').innerText = q.q;
+    
+    const feedback = document.getElementById('feedback');
+    const checkBtn = document.getElementById('check-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const audioBtn = document.getElementById('audio-btn');
+    const area = document.getElementById('interactive-area');
+
+    feedback.style.display = 'none';
+    checkBtn.style.display = 'block';
+    nextBtn.style.display = 'none';
+    selectedChoiceIndex = null;
+    userSelectedSequence = [];
+    area.innerHTML = '';
+
+    if (q.type === 'listening') {
+        audioBtn.style.display = 'inline-flex';
+    } else {
+        audioBtn.style.display = 'none';
+    }
+
+    if (q.type === 'choice' || q.type === 'listening') {
+        const optsDiv = document.createElement('div');
+        optsDiv.className = 'options';
+        
+        q.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => selectChoiceOption(idx, btn);
+            optsDiv.appendChild(btn);
+        });
+        area.appendChild(optsDiv);
+    } else if (q.type === 'unscramble') {
+        const answerZone = document.createElement('div');
+        answerZone.className = 'answer-zone';
+        answerZone.id = 'answer-zone';
+        
+        const wordPool = document.createElement('div');
+        wordPool.className = 'word-pool';
+        wordPool.id = 'word-pool';
+
+        const shuffledWords = shuffleArray(q.words);
+        shuffledWords.forEach((word) => {
+            const chip = document.createElement('div');
+            chip.className = 'word-chip';
+            chip.innerText = word;
+            chip.onclick = () => toggleWordChip(chip, word);
+            wordPool.appendChild(chip);
+        });
+
+        area.appendChild(answerZone);
+        area.appendChild(wordPool);
+    }
+}
+
+function selectChoiceOption(idx, btn) {
+    playSound('click');
+    selectedChoiceIndex = idx;
+    const allBtns = document.querySelectorAll('.option-btn');
+    allBtns.forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+}
+
+function toggleWordChip(chip, word) {
+    playSound('click');
+    const answerZone = document.getElementById('answer-zone');
+    const wordPool = document.getElementById('word-pool');
+
+    if (chip.parentElement === wordPool) {
+        answerZone.appendChild(chip);
+        userSelectedSequence.push(word);
+    } else {
+        wordPool.appendChild(chip);
+        const index = userSelectedSequence.indexOf(word);
+        if (index > -1) userSelectedSequence.splice(index, 1);
+    }
+}
+
+function checkAnswer() {
+    const q = questions[currentIndex];
+    let isCorrect = false;
+
+    if (q.type === 'choice' || q.type === 'listening') {
+        if (selectedChoiceIndex === null) {
+            alert('กรุณาเลือกคำตอบก่อนกดเช็คคำตอบครับ');
+            return;
+        }
+        isCorrect = (selectedChoiceIndex === q.ans);
+    } else if (q.type === 'unscramble') {
+        if (userSelectedSequence.length === 0) {
+            alert('กรุณาเรียงประโยคก่อนกดเช็คคำตอบครับ');
+            return;
+        }
+        const userStr = userSelectedSequence.join('');
+        const correctStr = q.correctSeq.join('');
+        isCorrect = (userStr === correctStr);
+    }
+
+    disableInputs();
+
+    const feedback = document.getElementById('feedback');
+    const checkBtn = document.getElementById('check-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    if (isCorrect) {
+        playSound('correct');
+        score++;
+        feedback.className = 'feedback correct';
+        feedback.innerHTML = `
+            ✅ <b>ถูกต้อง!</b><br>
+            🇯🇵 <b>คำตอบ:</b> ${q.ja}<br>
+            🗣️ <b>เสียงอ่าน (Romaji):</b> ${q.romaji}<br>
+            🇹🇭 <b>คำแปล:</b> ${q.th}
+        `;
+    } else {
+        playSound('wrong');
+        feedback.className = 'feedback wrong';
+        feedback.innerHTML = `❌ <b>ยังไม่ถูกต้อง!</b>`;
+    }
+
+    feedback.style.display = 'block';
+    checkBtn.style.display = 'none';
+    nextBtn.style.display = 'block';
+}
+
+function disableInputs() {
+    const btns = document.querySelectorAll('.option-btn, .word-chip');
+    btns.forEach(btn => {
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.7';
+    });
+}
+
+function nextQuestion() {
+    playSound('click');
+    currentIndex++;
+    if (currentIndex < questions.length) {
+        showQuestion();
+    } else {
+        showEndScreen();
+    }
+}
+
+function showEndScreen() {
+    document.getElementById('quiz-screen').style.display = 'none';
+    document.getElementById('end-screen').style.display = 'block';
+    document.getElementById('final-score').innerText = score;
+}
+
+window.onload = startQuiz;
+</script>
+
+</body>
+</html>
