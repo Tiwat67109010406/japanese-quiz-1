@@ -2,8 +2,9 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แบบฝึกหัดภาษาญี่ปุ่น (เวอร์ชันปรับปรุง)</title>
+    <!-- ป้องกันการหน่วงเวลา (Delay) จากการซูมและแตะหน้าจอในมือถือ 100% -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>แบบฝึกหัดภาษาญี่ปุ่น (Combo System)</title>
     <style>
         :root {
             --primary: #4f46e5;
@@ -11,12 +12,10 @@
             --bg: #f3f4f6;
             --card: #ffffff;
             --text: #1f2937;
-            --success: #10b981;
-            --danger: #ef4444;
         }
 
         body {
-            font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
@@ -33,6 +32,58 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.08);
             padding: 24px;
             box-sizing: border-box;
+        }
+
+        /* ----- Progress Bar & Combo ----- */
+        .progress-container {
+            width: 100%;
+            height: 14px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            border-radius: 10px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* เอฟเฟกต์สีรุ้งตอนทำคอมโบ */
+        .progress-bar.rainbow {
+            background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3, #ff0000);
+            background-size: 200% 100%;
+            animation: rainbow-scroll 1.5s linear infinite;
+        }
+
+        @keyframes rainbow-scroll {
+            0% { background-position: 100% 0; }
+            100% { background-position: 0 0; }
+        }
+
+        .combo-text {
+            text-align: right;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #ef4444;
+            min-height: 20px;
+            margin-bottom: 10px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .combo-text.active {
+            opacity: 1;
+            animation: bounce 0.4s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
 
         .header {
@@ -54,20 +105,18 @@
             background: #3b82f6; color: white; border: none; padding: 12px 20px;
             border-radius: 10px; font-size: 1.1rem; cursor: pointer;
             display: inline-flex; align-items: center; gap: 8px; margin-bottom: 15px;
-            font-weight: bold; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+            font-weight: bold; touch-action: manipulation;
         }
-        .audio-btn:hover { background: #2563eb; transform: translateY(-2px); }
-        .audio-btn:active { transform: translateY(0); }
 
         .options { display: flex; flex-direction: column; gap: 10px; }
         .option-btn {
             background: #f9fafb; border: 2px solid #e5e7eb; padding: 12px 16px;
             border-radius: 10px; font-size: 1.1rem; text-align: left; cursor: pointer;
-            transition: all 0.2s;
+            touch-action: manipulation;
         }
-        .option-btn:hover { border-color: var(--primary); background: #e0e7ff; transform: translateX(4px); }
         .option-btn.selected { border-color: var(--primary); background: #e0e7ff; font-weight: bold; }
 
+        /* ----- แก้ไขปัญหาการหน่วงในเกมเรียงประโยค ----- */
         .word-pool, .answer-zone {
             display: flex; flex-wrap: wrap; gap: 10px; min-height: 55px; padding: 12px;
             border-radius: 12px; margin-bottom: 15px;
@@ -76,20 +125,21 @@
         .word-chip {
             background: #ffffff; border: 2px solid #cbd5e1; padding: 10px 16px;
             border-radius: 10px; font-size: 1.1rem; cursor: pointer; user-select: none;
-            transition: transform 0.1s;
+            /* ลบ transition หนักๆ ออก ใส่ touch-action ป้องกัน tap-delay */
+            touch-action: manipulation;
+            transform: scale(1);
+            transition: transform 0.05s ease, background 0.1s ease;
         }
-        .word-chip:hover { border-color: var(--primary); }
-        .word-chip:active { transform: scale(0.95); }
+        .word-chip:active { transform: scale(0.92); background: #e0e7ff; }
 
-        /* ระบบจับคู่ (Matching Game) */
+        /* ----- ระบบจับคู่ (Matching Game) ----- */
         .matching-container { display: flex; gap: 15px; justify-content: space-between; margin-bottom: 20px; }
         .matching-column { flex: 1; display: flex; flex-direction: column; gap: 12px; }
         .match-item {
             padding: 14px 10px; border: 2px solid #cbd5e1; border-radius: 10px;
             text-align: center; cursor: pointer; background: white; user-select: none;
-            transition: all 0.2s; font-size: 1.1rem; font-weight: 500;
+            font-size: 1.1rem; font-weight: 500; touch-action: manipulation;
         }
-        .match-item:hover { border-color: var(--primary); background: #f8fafc; }
         .match-item.selected { background: #e0e7ff; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); }
         .match-item.matched { background: #dcfce7; border-color: #10b981; color: #15803d; pointer-events: none; opacity: 0.6; }
         .match-item.wrong { animation: shake 0.4s; background: #fee2e2; border-color: #ef4444; color: #b91c1c; }
@@ -104,12 +154,10 @@
         .action-btn-group { display: flex; gap: 10px; margin-top: 15px; }
         .check-btn, .next-btn {
             width: 100%; color: white; border: none; padding: 14px;
-            border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer;
+            border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer; touch-action: manipulation;
         }
         .check-btn { background: var(--primary); }
         .next-btn { background: #10b981; display: none; }
-        .check-btn:hover { background: var(--primary-hover); }
-        .next-btn:hover { background: #059669; }
 
         .feedback { margin-top: 20px; padding: 15px; border-radius: 10px; display: none; font-weight: 500; line-height: 1.6; }
         .feedback.correct { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
@@ -125,15 +173,21 @@
 
 <div class="container">
     <div id="quiz-screen">
+        
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div id="combo-text" class="combo-text">🔥 Combo x2!</div>
+
         <div class="header">
             <span class="part-badge" id="part-title">Part 1</span>
-            <span class="progress" id="progress-text">ข้อ 1 / 30</span>
+            <span class="progress" id="progress-text">ข้อ 1 / 15</span>
         </div>
 
         <div class="question-box">
-            <div class="question-text" id="question-text">คำถามจะแสดงตรงนี้</div>
+            <div class="question-text" id="question-text">คำถาม</div>
             <button id="audio-btn" class="audio-btn" onclick="playQuestionAudio()" style="display: none;">
-                🔊 กดฟังเสียงโจทย์
+                🔊 กดฟังเสียง
             </button>
             <div id="interactive-area"></div>
         </div>
@@ -147,26 +201,23 @@
     </div>
 
     <div id="end-screen" class="end-screen" style="display: none;">
-        <h2>🎉 ทำแบบฝึกหัดเสร็จสิ้น!</h2>
+        <h2>🎉 จบแบบฝึกหัด!</h2>
         <p style="font-size: 1.5rem; font-weight: bold; margin: 20px 0;">
-            คุณได้คะแนน: <span id="final-score" style="color: var(--primary);">0</span> / <span id="total-score">30</span>
+            คะแนน: <span id="final-score" style="color: var(--primary);">0</span> / <span id="total-score">15</span>
         </p>
         <div class="end-buttons">
             <button id="retry-mistakes-btn" class="retry-mistakes-btn" onclick="startMistakesQuiz()" style="display: none;">
-                ❌ ทำข้อที่ผิดซ้ำ (<span id="wrong-count">0</span> ข้อ)
+                ❌ ซ่อมข้อที่ผิด (<span id="wrong-count">0</span> ข้อ)
             </button>
-            <button class="restart-btn" onclick="startQuiz()">🔄 สุ่มเริ่มทำใหม่ (เซ็ตใหม่)</button>
+            <button class="restart-btn" onclick="startQuiz()">🔄 สุ่มเริ่มเซ็ตใหม่ 15 ข้อ</button>
         </div>
     </div>
 </div>
 
 <script>
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-window.speechSynthesis.getVoices(); 
-if (speechSynthesis.onvoiceschanged !== undefined) {
-  speechSynthesis.onvoiceschanged = window.speechSynthesis.getVoices;
-}
+let voicesLoaded = false;
+window.speechSynthesis.onvoiceschanged = () => { voicesLoaded = true; };
 
 function playSound(type) {
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -174,9 +225,9 @@ function playSound(type) {
     if (type === 'click') {
         const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
         osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
-        gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-        osc.start(now); osc.stop(now + 0.05);
+        osc.type = 'sine'; osc.frequency.setValueAtTime(700, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.04);
+        gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+        osc.start(now); osc.stop(now + 0.04);
     } 
     else if (type === 'correct') {
         const notes = [523.25, 659.25, 783.99, 1046.50];
@@ -199,7 +250,6 @@ function playSound(type) {
     }
 }
 
-// ถอด Timeout ออกเพื่อให้ทำงานพร้อมกับการกดปุ่มโดยตรง (ป้องกันบราวเซอร์มือถือบล็อกเสียง)
 function speakJapaneseText(text) {
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
@@ -214,30 +264,14 @@ function speakJapaneseText(text) {
     }
 }
 
-// ----------------------------------------------------
-// ระบบสร้างโจทย์อัตโนมัติ (Generator)
-// ----------------------------------------------------
 const rawQuestions = (function generateAllQuestions() {
-    let questions = [];
-    let id = 1;
-    
-    const v = [
-        { j: 'ごはん', t: 'ข้าว', r: 'Gohan' },
-        { j: 'みず', t: 'น้ำ', r: 'Mizu' },
-        { j: 'おちゃ', t: 'ชาเขียว', r: 'Ocha' },
-        { j: 'すし', t: 'ซูชิ', r: 'Sushi' }
-    ];
-
+    let qArr = []; let id = 1;
+    const v = [ { j: 'ごはん', t: 'ข้าว', r: 'Gohan' }, { j: 'みず', t: 'น้ำ', r: 'Mizu' }, { j: 'おちゃ', t: 'ชาเขียว', r: 'Ocha' }, { j: 'すし', t: 'ซูชิ', r: 'Sushi' } ];
     let bases = [];
     for (let i = 0; i < v.length; i++) {
         for (let k = 0; k < v.length; k++) {
             if (i === k) continue;
-            bases.push({
-                ja: `${v[i].j}と${v[k].j}、ください。`,
-                th: `ขอ${v[i].t}และ${v[k].t}ครับ/ค่ะ`,
-                romaji: `${v[i].r} to ${v[k].r}, kudasai.`,
-                type: 'AとB', words: [v[i].j, 'と', `${v[k].j}、`, 'ください。']
-            });
+            bases.push({ ja: `${v[i].j}と${v[k].j}、ください。`, th: `ขอ${v[i].t}และ${v[k].t}ครับ/ค่ะ`, romaji: `${v[i].r} to ${v[k].r}, kudasai.`, type: 'AとB', words: [v[i].j, 'と', `${v[k].j}、`, 'ください。'] });
         }
     }
     v.forEach(x => bases.push({ ja: `${x.j}です。`, th: `คือ${x.t}ครับ/ค่ะ`, romaji: `${x.r} desu.`, type: 'Aです', words: [x.j, 'です。'] }));
@@ -245,63 +279,37 @@ const rawQuestions = (function generateAllQuestions() {
 
     function getWrongOptions(correctStr, key, count) {
         let options = bases.filter(b => b[key] !== correctStr).map(b => b[key]);
-        options.sort(() => 0.5 - Math.random());
-        return [...new Set(options)].slice(0, count);
+        return shuffleArray([...new Set(options)]).slice(0, count);
     }
 
-    // Part 1 & 2: Choice & Listening (สุ่มบางส่วน)
-    bases.slice(0, 20).forEach(b => {
-        let opts1 = getWrongOptions(b.th, 'th', 2);
-        opts1.push(b.th); opts1.sort(() => 0.5 - Math.random());
-        questions.push({ id: id++, type: 'choice', part: 'Part 1: อ่านและแปล', q: `คำแปลของ "${b.ja}" คือข้อใด?`, options: opts1, ans: opts1.indexOf(b.th), ja: b.ja, romaji: b.romaji, th: b.th });
-
-        let optsAudio = getWrongOptions(b.ja, 'ja', 2);
-        optsAudio.push(b.ja); optsAudio.sort(() => 0.5 - Math.random());
-        questions.push({ id: id++, type: 'listening', part: 'Part 2: ฟังเสียง', q: '🔊 ฟังเสียงแล้วเลือกประโยคภาษาญี่ปุ่นที่ได้ยิน', audioText: b.ja, options: optsAudio, ans: optsAudio.indexOf(b.ja), ja: b.ja, romaji: b.romaji, th: b.th });
+    bases.forEach(b => {
+        let opts1 = getWrongOptions(b.th, 'th', 2); opts1.push(b.th);
+        qArr.push({ id: id++, type: 'choice', part: 'Part 1: อ่านและแปล', q: `คำแปลของ "${b.ja}" คือข้อใด?`, options: shuffleArray(opts1), ans: b.th, ja: b.ja, romaji: b.romaji, th: b.th });
+        
+        let optsAudio = getWrongOptions(b.ja, 'ja', 2); optsAudio.push(b.ja);
+        qArr.push({ id: id++, type: 'listening', part: 'Part 2: ฟังเสียง', q: '🔊 ฟังเสียงแล้วเลือกประโยคภาษาญี่ปุ่น', audioText: b.ja, options: shuffleArray(optsAudio), ans: b.ja, ja: b.ja, romaji: b.romaji, th: b.th });
     });
 
-    // Part 3: Unscramble (ตัดเสียงออกตอนเรียงเพื่อไม่ให้หน่วง)
     const allChips = ['ごはん', 'みず', 'おちゃ', 'すし', 'と', 'です。', 'ください。', 'みず、', 'すし、', 'おちゃ、', 'ごはん、'];
-    bases.slice(0, 10).forEach(b => {
-        let decoys = allChips.filter(c => !b.words.includes(c)).sort(() => 0.5 - Math.random()).slice(0, 2);
-        let finalWords = [...b.words, ...decoys];
-        questions.push({ id: id++, type: 'unscramble', part: 'Part 3: เรียงประโยค', q: `เรียงคำให้ถูกต้อง: "${b.th}"`, words: finalWords, correctSeq: b.words, ja: b.ja, romaji: b.romaji, th: b.th });
+    bases.forEach(b => {
+        let decoys = shuffleArray(allChips.filter(c => !b.words.includes(c))).slice(0, 2);
+        qArr.push({ id: id++, type: 'unscramble', part: 'Part 3: เรียงประโยค', q: `เรียงคำให้ถูกต้อง: "${b.th}"`, words: [...b.words, ...decoys], correctSeq: b.words, ja: b.ja, romaji: b.romaji, th: b.th });
     });
 
-    // Part 4: Matching (ญี่ปุ่น -> ไทย)
-    questions.push({
-        id: id++, type: 'matching', part: 'Part 4: จับคู่คำศัพท์', 
-        q: 'จับคู่คำศัพท์ภาษาญี่ปุ่น (ซ้าย) กับคำแปลภาษาไทย (ขวา)',
-        pairs: [ { l: 'ごはん', r: 'ข้าว' }, { l: 'みず', r: 'น้ำ' }, { l: 'おちゃ', r: 'ชาเขียว' }, { l: 'すし', r: 'ซูชิ' } ]
-    });
+    // Part 4 & 5 (เพิ่ม Type เฉพาะให้ค้นหาง่าย)
+    qArr.push({ id: 'P4', type: 'matching', sub: 'p4', part: 'Part 4: จับคู่คำศัพท์', q: 'จับคู่ภาษาญี่ปุ่น (ซ้าย) กับคำแปล (ขวา)', pairs: [ { l: 'ごはん', r: 'ข้าว' }, { l: 'みず', r: 'น้ำ' }, { l: 'おちゃ', r: 'ชาเขียว' }, { l: 'すし', r: 'ซูชิ' } ] });
+    qArr.push({ id: 'P5', type: 'matching', sub: 'p5', part: 'Part 5: จับคู่โรมาจิ', q: 'จับคู่โรมาจิ (ซ้าย) กับภาษาญี่ปุ่น (ขวา)', pairs: [ { l: 'Gohan', r: 'ごはん' }, { l: 'Mizu', r: 'みず' }, { l: 'Ocha', r: 'おちゃ' }, { l: 'Sushi', r: 'すし' } ], noSound: true });
 
-    // Part 5: Matching (Romaji -> ญี่ปุ่น - ปิดเสียง)
-    questions.push({
-        id: id++, type: 'matching', part: 'Part 5: จับคู่โรมาจิ', 
-        q: 'จับคู่คำอ่านโรมาจิ (ซ้าย) กับตัวอักษรภาษาญี่ปุ่น (ขวา)',
-        pairs: [ { l: 'Gohan', r: 'ごはん' }, { l: 'Mizu', r: 'みず' }, { l: 'Ocha', r: 'おちゃ' }, { l: 'Sushi', r: 'すし' } ],
-        noSound: true // ปิดเสียงทุกรูปแบบในข้อนี้
-    });
-
-    return questions;
+    return qArr;
 })();
 
-// ----------------------------------------------------
-// UI & Logic
-// ----------------------------------------------------
-let questions = [];
-let wrongQuestions = [];
-let currentIndex = 0;
-let score = 0;
-let selectedChoiceIndex = null;
-let userSelectedSequence = [];
-let hasScoredThisQuestion = false; 
+let questions = []; let wrongQuestions = [];
+let currentIndex = 0; let score = 0; let combo = 0;
+let selectedChoiceStr = null; let userSelectedSequence = [];
 let hasFailedThisQuestion = false;
 
-// ตัวแปรสำหรับโหมดจับคู่
-let matchSelectedLeft = null;
-let matchSelectedRight = null;
-let matchedPairs = 0;
+// ตัวแปรจับคู่
+let matchSelectedLeft = null; let matchSelectedRight = null; let matchedPairs = 0;
 
 function shuffleArray(array) {
     let arr = [...array];
@@ -312,15 +320,18 @@ function shuffleArray(array) {
     return arr;
 }
 
-function playQuestionAudio() {
-    const q = questions[currentIndex];
-    if (q.type === 'listening' && !q.noSound) {
-        speakJapaneseText(q.audioText);
-    }
-}
-
 function startQuiz() {
-    questions = shuffleArray(rawQuestions).slice(0, 25); // สุ่มมา 25 ข้อต่อรอบ
+    // 1. ดึง Part 4 และ 5 อย่างละ 1 ชุด
+    const p4 = rawQuestions.find(q => q.sub === 'p4');
+    const p5 = rawQuestions.find(q => q.sub === 'p5');
+    
+    // 2. ดึงข้อธรรมดา (Part 1-3) มาสุ่ม 13 ข้อ
+    const others = rawQuestions.filter(q => q.type !== 'matching');
+    const selectedOthers = shuffleArray(others).slice(0, 13);
+    
+    // 3. รวมเป็น 15 ข้อ แล้วสลับลำดับข้อให้มั่ว
+    questions = shuffleArray([...selectedOthers, p4, p5]);
+    
     wrongQuestions = [];
     resetAndStart();
 }
@@ -332,102 +343,104 @@ function startMistakesQuiz() {
 }
 
 function resetAndStart() {
-    currentIndex = 0;
-    score = 0;
+    currentIndex = 0; score = 0; combo = 0;
     document.getElementById('quiz-screen').style.display = 'block';
     document.getElementById('end-screen').style.display = 'none';
+    updateProgressBar();
     showQuestion();
 }
 
+function updateProgressBar() {
+    const pct = (currentIndex / questions.length) * 100;
+    const bar = document.getElementById('progress-bar');
+    const comboTxt = document.getElementById('combo-text');
+    
+    bar.style.width = pct + '%';
+
+    if (combo >= 2) {
+        bar.classList.add('rainbow');
+        comboTxt.innerText = `🔥 Combo x${combo}!`;
+        comboTxt.classList.add('active');
+    } else {
+        bar.classList.remove('rainbow');
+        comboTxt.classList.remove('active');
+    }
+}
+
 function showQuestion() {
+    updateProgressBar();
     const q = questions[currentIndex];
     document.getElementById('part-title').innerText = q.part;
     document.getElementById('progress-text').innerText = `ข้อ ${currentIndex + 1} / ${questions.length}`;
     document.getElementById('question-text').innerText = q.q;
     
-    const feedback = document.getElementById('feedback');
-    const checkBtn = document.getElementById('check-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const audioBtn = document.getElementById('audio-btn');
     const area = document.getElementById('interactive-area');
-
-    feedback.style.display = 'none';
-    checkBtn.style.display = 'block';
-    nextBtn.style.display = 'none';
     area.innerHTML = '';
+    
+    document.getElementById('feedback').style.display = 'none';
+    document.getElementById('check-btn').style.display = 'block';
+    document.getElementById('next-btn').style.display = 'none';
 
-    selectedChoiceIndex = null;
-    userSelectedSequence = [];
-    matchSelectedLeft = null;
-    matchSelectedRight = null;
-    matchedPairs = 0;
-    hasScoredThisQuestion = false;
+    selectedChoiceStr = null; userSelectedSequence = [];
+    matchSelectedLeft = null; matchSelectedRight = null; matchedPairs = 0;
     hasFailedThisQuestion = false;
 
     if (q.type === 'listening') {
-        audioBtn.style.display = 'inline-flex';
+        document.getElementById('audio-btn').style.display = 'inline-flex';
     } else {
-        audioBtn.style.display = 'none';
+        document.getElementById('audio-btn').style.display = 'none';
     }
 
     if (q.type === 'choice' || q.type === 'listening') {
-        const optsDiv = document.createElement('div');
-        optsDiv.className = 'options';
-        q.options.forEach((opt, idx) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn'; btn.innerText = opt;
-            btn.onclick = () => selectChoiceOption(idx, btn);
+        const optsDiv = document.createElement('div'); optsDiv.className = 'options';
+        q.options.forEach(opt => {
+            const btn = document.createElement('button'); btn.className = 'option-btn'; btn.innerText = opt;
+            btn.onclick = () => { playSound('click'); selectedChoiceStr = opt; document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); };
             optsDiv.appendChild(btn);
         });
         area.appendChild(optsDiv);
     } else if (q.type === 'unscramble') {
-        const answerZone = document.createElement('div');
-        answerZone.className = 'answer-zone'; answerZone.id = 'answer-zone';
-        const wordPool = document.createElement('div');
-        wordPool.className = 'word-pool'; wordPool.id = 'word-pool';
+        const answerZone = document.createElement('div'); answerZone.className = 'answer-zone'; answerZone.id = 'answer-zone';
+        const wordPool = document.createElement('div'); wordPool.className = 'word-pool'; wordPool.id = 'word-pool';
 
-        const shuffledWords = shuffleArray(q.words);
-        shuffledWords.forEach((word) => {
-            const chip = document.createElement('div');
-            chip.className = 'word-chip'; chip.innerText = word;
-            chip.onclick = () => toggleWordChip(chip, word);
+        shuffleArray(q.words).forEach(word => {
+            const chip = document.createElement('div'); chip.className = 'word-chip'; chip.innerText = word;
+            chip.onclick = () => {
+                playSound('click');
+                if (chip.parentElement === wordPool) {
+                    answerZone.appendChild(chip); userSelectedSequence.push(word);
+                } else {
+                    wordPool.appendChild(chip);
+                    const idx = userSelectedSequence.indexOf(word);
+                    if (idx > -1) userSelectedSequence.splice(idx, 1);
+                }
+            };
             wordPool.appendChild(chip);
         });
         area.appendChild(answerZone); area.appendChild(wordPool);
     } else if (q.type === 'matching') {
-        renderMatching(q, area);
+        document.getElementById('check-btn').style.display = 'none';
+        
+        const container = document.createElement('div'); container.className = 'matching-container';
+        const colL = document.createElement('div'); colL.className = 'matching-column';
+        const colR = document.createElement('div'); colR.className = 'matching-column';
+
+        let leftItems = shuffleArray(q.pairs.map((p, i) => ({ text: p.l, id: i, side: 'left' })));
+        let rightItems = shuffleArray(q.pairs.map((p, i) => ({ text: p.r, id: i, side: 'right' })));
+
+        leftItems.forEach(item => {
+            let div = document.createElement('div'); div.className = 'match-item left-item'; div.innerText = item.text;
+            div.onclick = () => handleMatchSelect(div, item, q); colL.appendChild(div);
+        });
+        rightItems.forEach(item => {
+            let div = document.createElement('div'); div.className = 'match-item right-item'; div.innerText = item.text;
+            div.onclick = () => handleMatchSelect(div, item, q); colR.appendChild(div);
+        });
+        container.appendChild(colL); container.appendChild(colR); area.appendChild(container);
     }
 }
 
-function renderMatching(q, area) {
-    const container = document.createElement('div'); container.className = 'matching-container';
-    const colL = document.createElement('div'); colL.className = 'matching-column';
-    const colR = document.createElement('div'); colR.className = 'matching-column';
-
-    let leftItems = q.pairs.map((p, i) => ({ text: p.l, id: i, side: 'left' }));
-    let rightItems = q.pairs.map((p, i) => ({ text: p.r, id: i, side: 'right' }));
-
-    leftItems = shuffleArray(leftItems); rightItems = shuffleArray(rightItems);
-
-    leftItems.forEach(item => {
-        let div = document.createElement('div'); div.className = 'match-item left-item'; div.innerText = item.text;
-        div.onclick = () => selectMatch(div, item, q);
-        colL.appendChild(div);
-    });
-
-    rightItems.forEach(item => {
-        let div = document.createElement('div'); div.className = 'match-item right-item'; div.innerText = item.text;
-        div.onclick = () => selectMatch(div, item, q);
-        colR.appendChild(div);
-    });
-
-    container.appendChild(colL); container.appendChild(colR);
-    area.appendChild(container);
-    
-    document.getElementById('check-btn').style.display = 'none'; // โหมดนี้ให้ระบบเช็คอัตโนมัติ
-}
-
-function selectMatch(el, item, q) {
+function handleMatchSelect(el, item, q) {
     playSound('click');
     if (item.side === 'left') {
         document.querySelectorAll('.left-item:not(.matched)').forEach(d => d.classList.remove('selected'));
@@ -439,67 +452,36 @@ function selectMatch(el, item, q) {
 
     if (matchSelectedLeft && matchSelectedRight) {
         if (matchSelectedLeft.item.id === matchSelectedRight.item.id) {
-            // จับคู่ถูก
             playSound('correct');
             matchSelectedLeft.el.classList.remove('selected'); matchSelectedRight.el.classList.remove('selected');
             matchSelectedLeft.el.classList.add('matched'); matchSelectedRight.el.classList.add('matched');
-            matchedPairs++;
-            matchSelectedLeft = null; matchSelectedRight = null;
+            matchedPairs++; matchSelectedLeft = null; matchSelectedRight = null;
             
             if (matchedPairs === q.pairs.length) {
-                const feedback = document.getElementById('feedback');
-                feedback.className = 'feedback correct';
-                feedback.innerHTML = `✅ <b>จับคู่ถูกต้องครบถ้วน เยี่ยมมากครับ!</b>`;
-                feedback.style.display = 'block';
+                if (!hasFailedThisQuestion) { score++; combo++; }
+                updateProgressBar();
+                document.getElementById('feedback').className = 'feedback correct';
+                document.getElementById('feedback').innerHTML = `✅ <b>จับคู่ถูกต้องครบถ้วน!</b>`;
+                document.getElementById('feedback').style.display = 'block';
                 document.getElementById('next-btn').style.display = 'block';
-                if (!hasScoredThisQuestion && !hasFailedThisQuestion) { score++; hasScoredThisQuestion = true; }
             }
         } else {
-            // จับคู่ผิด
             playSound('wrong');
+            combo = 0; updateProgressBar();
+            hasFailedThisQuestion = true;
+            if (!wrongQuestions.includes(q)) wrongQuestions.push(q);
+            
             matchSelectedLeft.el.classList.add('wrong'); matchSelectedRight.el.classList.add('wrong');
             let lTemp = matchSelectedLeft; let rTemp = matchSelectedRight;
             matchSelectedLeft = null; matchSelectedRight = null;
-            
-            setTimeout(() => {
-                lTemp.el.classList.remove('wrong', 'selected');
-                rTemp.el.classList.remove('wrong', 'selected');
-            }, 400);
-
-            if (!hasFailedThisQuestion) { wrongQuestions.push(q); hasFailedThisQuestion = true; }
+            setTimeout(() => { lTemp.el.classList.remove('wrong', 'selected'); rTemp.el.classList.remove('wrong', 'selected'); }, 400);
         }
     }
 }
 
-function selectChoiceOption(idx, btn) {
-    playSound('click');
-    document.getElementById('feedback').style.display = 'none';
-    document.getElementById('check-btn').style.display = 'block';
-    document.getElementById('next-btn').style.display = 'none';
-    
-    selectedChoiceIndex = idx;
-    const allBtns = document.querySelectorAll('.option-btn');
-    allBtns.forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-}
-
-function toggleWordChip(chip, word) {
-    playSound('click'); // <--- ปิดเสียงพูดอัตโนมัติแล้ว เหลือแค่เสียงปุ่ม ช่วยให้เรียงประโยคเร็วขึ้นไม่หน่วง
-    document.getElementById('feedback').style.display = 'none';
-    document.getElementById('check-btn').style.display = 'block';
-    document.getElementById('next-btn').style.display = 'none';
-    
-    const answerZone = document.getElementById('answer-zone');
-    const wordPool = document.getElementById('word-pool');
-
-    if (chip.parentElement === wordPool) {
-        answerZone.appendChild(chip);
-        userSelectedSequence.push(word);
-    } else {
-        wordPool.appendChild(chip);
-        const index = userSelectedSequence.indexOf(word);
-        if (index > -1) userSelectedSequence.splice(index, 1);
-    }
+function playQuestionAudio() {
+    const q = questions[currentIndex];
+    if (q.type === 'listening' && !q.noSound) speakJapaneseText(q.audioText);
 }
 
 function checkAnswer() {
@@ -507,32 +489,30 @@ function checkAnswer() {
     let isCorrect = false;
 
     if (q.type === 'choice' || q.type === 'listening') {
-        if (selectedChoiceIndex === null) { alert('กรุณาเลือกคำตอบก่อนครับ'); return; }
-        isCorrect = (selectedChoiceIndex === q.ans);
+        if (!selectedChoiceStr) { alert('กรุณาเลือกคำตอบก่อนครับ'); return; }
+        isCorrect = (selectedChoiceStr === q.ans);
     } else if (q.type === 'unscramble') {
         if (userSelectedSequence.length === 0) { alert('กรุณาเรียงประโยคก่อนครับ'); return; }
-        const userStr = userSelectedSequence.join('');
-        const correctStr = q.correctSeq.join('');
-        isCorrect = (userStr === correctStr);
+        isCorrect = (userSelectedSequence.join('') === q.correctSeq.join(''));
     }
 
     const feedback = document.getElementById('feedback');
-    const checkBtn = document.getElementById('check-btn');
-    const nextBtn = document.getElementById('next-btn');
-
     if (isCorrect) {
         playSound('correct');
-        if (!q.noSound) setTimeout(() => { speakJapaneseText(q.ja); }, 50);
-        if (!hasScoredThisQuestion && !hasFailedThisQuestion) { score++; hasScoredThisQuestion = true; }
-
+        if (!q.noSound) setTimeout(() => speakJapaneseText(q.ja), 50);
+        if (!hasFailedThisQuestion) { score++; combo++; }
+        
+        updateProgressBar();
         feedback.className = 'feedback correct';
-        feedback.innerHTML = `✅ <b>ถูกต้อง!</b><br>🇯🇵 <b>คำตอบ:</b> ${q.ja}<br>🗣️ <b>(Romaji):</b> ${q.romaji}<br>🇹🇭 <b>คำแปล:</b> ${q.th}`;
-        checkBtn.style.display = 'none'; nextBtn.style.display = 'block';
+        feedback.innerHTML = `✅ <b>ถูกต้อง!</b><br>🇯🇵 <b>${q.ja}</b><br>🗣️ ${q.romaji}<br>🇹🇭 ${q.th}`;
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
     } else {
         playSound('wrong');
+        combo = 0; updateProgressBar();
         if (!hasFailedThisQuestion) { wrongQuestions.push(q); hasFailedThisQuestion = true; }
         feedback.className = 'feedback wrong';
-        feedback.innerHTML = `❌ <b>ยังไม่ถูกต้อง! ลองเปลี่ยนคำตอบใหม่อีกครั้งนะครับ</b>`;
+        feedback.innerHTML = `❌ <b>ยังไม่ถูกต้อง ลองแก้ใหม่อีกครั้งนะครับ</b>`;
     }
     feedback.style.display = 'block';
 }
@@ -550,12 +530,11 @@ function showEndScreen() {
     document.getElementById('final-score').innerText = score;
     document.getElementById('total-score').innerText = questions.length;
     
-    const retryBtn = document.getElementById('retry-mistakes-btn');
     if (wrongQuestions.length > 0) {
         document.getElementById('wrong-count').innerText = wrongQuestions.length;
-        retryBtn.style.display = 'block';
+        document.getElementById('retry-mistakes-btn').style.display = 'block';
     } else {
-        retryBtn.style.display = 'none';
+        document.getElementById('retry-mistakes-btn').style.display = 'none';
     }
 }
 
