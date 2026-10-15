@@ -250,6 +250,13 @@
 <script>
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+/* ----- ฟังก์ชันสั่นสะเทือน (Vibration API) ----- */
+function triggerVibration(pattern) {
+    if ('vibrate' in navigator) {
+        navigator.vibrate(pattern);
+    }
+}
+
 /* ----- ระบบเสียงสังเคราะห์สไตล์ Arcade/เกมการต่อสู้ ดุดัน ----- */
 function playSound(type, comboLevel = 0) {
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -267,8 +274,9 @@ function playSound(type, comboLevel = 0) {
         osc.start(now); osc.stop(now + 0.05);
     } 
     else if (type === 'correct') {
-        // เพิ่มความดุดันและทรงพลังตามระดับ Combo
-        let pitchMultiplier = 1 + Math.min(comboLevel * 0.08, 0.6); // ยิ่งคอมโบเยอะ พิตช์ยิ่งสูง
+        triggerVibration([40, 30, 60]); // สั่นตอบถูก 2 จังหวะสั้นๆ
+        
+        let pitchMultiplier = 1 + Math.min(comboLevel * 0.08, 0.6);
         
         // 1. เสียง Impact/Sub-bass หนักแน่น
         const bassOsc = audioCtx.createOscillator();
@@ -281,7 +289,7 @@ function playSound(type, comboLevel = 0) {
         bassGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
         bassOsc.start(now); bassOsc.stop(now + 0.25);
 
-        // 2. เสียง อาเคด Arpeggio เร็วสไตล์เกมยุค 90s
+        // 2. เสียง อาเคด Arpeggio
         const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
         const stepTime = comboLevel >= 8 ? 0.04 : (comboLevel >= 5 ? 0.05 : 0.07);
         
@@ -290,7 +298,6 @@ function playSound(type, comboLevel = 0) {
             const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
             
-            // โทนเสียง Sawtooth สไตล์ synth เกมตู้
             osc.type = comboLevel >= 5 ? 'sawtooth' : 'square'; 
             osc.frequency.setValueAtTime(freq * pitchMultiplier, now + idx * stepTime);
             
@@ -300,9 +307,16 @@ function playSound(type, comboLevel = 0) {
             osc.start(now + idx * stepTime); 
             osc.stop(now + idx * stepTime + 0.25);
         });
+
+        // 3. ถ้าเกิด Combo สตรีค 2 ขึ้นไป ให้เล่นเสียง Power-Up Combo เพิ่มเติมสอดแทรก
+        if (comboLevel >= 2) {
+            setTimeout(() => playComboSound(comboLevel), 120);
+        }
     } 
     else if (type === 'wrong') {
-        // เสียง Combo Break ดุดันแบบเกมต่อสู้ (Buzzing Heavy Impact)
+        triggerVibration([200]); // สั่นยาวหนักๆ 1 ครั้งตอนตอบผิด
+
+        // เสียง Combo Break ดุดันแบบเกมต่อสู้
         const osc1 = audioCtx.createOscillator();
         const osc2 = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
@@ -314,7 +328,7 @@ function playSound(type, comboLevel = 0) {
         osc1.frequency.setValueAtTime(160, now);
         osc1.frequency.exponentialRampToValueAtTime(40, now + 0.35);
         
-        osc2.frequency.setValueAtTime(116, now); // เกิดเสียงก้องหนาแบบ Discordant
+        osc2.frequency.setValueAtTime(116, now); 
         osc2.frequency.exponentialRampToValueAtTime(30, now + 0.35);
 
         gain.gain.setValueAtTime(0.35, now);
@@ -323,6 +337,32 @@ function playSound(type, comboLevel = 0) {
         osc1.start(now); osc2.start(now);
         osc1.stop(now + 0.35); osc2.stop(now + 0.35);
     }
+}
+
+/* ----- เอฟเฟกต์เสียง COMBO POWER-UP ดุดัน ----- */
+function playComboSound(level) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const now = audioCtx.currentTime;
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    // ยิ่ง Combo สูง เสียงยิ่งไต่ระดับความถี่สูงสะใจ
+    const baseFreq = 400 + Math.min(level * 80, 800);
+    const endFreq = baseFreq * 1.8;
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.18);
+
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+
+    osc.start(now);
+    osc.stop(now + 0.18);
 }
 
 function speakJapaneseText(text) {
@@ -378,8 +418,7 @@ const rawQuestions = (function generateAllQuestions() {
     qArr.push({ id: 'P4', type: 'matching', sub: 'p4', part: 'Part 4: จับคู่คำศัพท์', q: 'จับคู่ภาษาญี่ปุ่น (ซ้าย) กับคำแปล (ขวา)', pairs: [ { l: 'ごはん', r: 'ข้าว' }, { l: 'みず', r: 'น้ำ' }, { l: 'おちゃ', r: 'ชาเขียว' }, { l: 'すし', r: 'ซูชิ' } ] });
     qArr.push({ id: 'P5', type: 'matching', sub: 'p5', part: 'Part 5: จับคู่โรมาจิ', q: 'จับคู่โรมาจิ (ซ้าย) กับภาษาญี่ปุ่น (ขวา)', pairs: [ { l: 'Gohan', r: 'ごはん' }, { l: 'Mizu', r: 'みず' }, { l: 'Ocha', r: 'おちゃ' }, { l: 'Sushi', r: 'すし' } ], noSound: true });
 
-    return qArr;
-})();
+    return qArr;})();
 
 let questions = []; let wrongQuestions = [];
 let currentIndex = 0; let score = 0; let combo = 0;
@@ -495,7 +534,7 @@ function showQuestion() {
             chip.onclick = () => {
                 playSound('click');
 
-                // อ่านเสียงภาษาญี่ปุ่นเฉพาะตอนกดเลือกเข้าช่องตอบ (Pool -> Zone)
+                // อ่านเสียงเฉพาะตอนกดเลือกเข้าช่องตอบ (Pool -> Zone)
                 if (chip.parentElement === wordPool) {
                     speakJapaneseText(word);
                     answerZone.appendChild(chip); 
@@ -550,7 +589,7 @@ function handleMatchSelect(el, item, q) {
     if (matchSelectedLeft && matchSelectedRight) {
         if (matchSelectedLeft.item.id === matchSelectedRight.item.id) {
             if (!hasFailedThisQuestion) { combo++; }
-            playSound('correct', combo); // ส่งระดับ Combo ไปประมวลผลเสียงดุดัน
+            playSound('correct', combo); 
             
             matchSelectedLeft.el.classList.remove('selected'); matchSelectedRight.el.classList.remove('selected');
             matchSelectedLeft.el.classList.add('matched'); matchSelectedRight.el.classList.add('matched');
@@ -603,7 +642,7 @@ function checkAnswer() {
     const feedback = document.getElementById('feedback');
     if (isCorrect) {
         if (!hasFailedThisQuestion) { score++; combo++; }
-        playSound('correct', combo); // เล่นเสียงตอบถูกพร้อมระดับพลัง Combo
+        playSound('correct', combo); 
         
         if (!q.noSound) setTimeout(() => speakJapaneseText(q.ja), 50);
         
