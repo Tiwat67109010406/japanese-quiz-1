@@ -8,9 +8,9 @@
         :root {
             --primary: #4f46e5;
             --primary-hover: #4338ca;
-            --bg: #f3f4f6;
+            --bg: #f8fafc;
             --card: #ffffff;
-            --text: #1f2937;
+            --text: #0f172a;
         }
 
         body {
@@ -27,28 +27,29 @@
             width: 100%;
             max-width: 650px;
             background: var(--card);
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
             padding: 24px;
             box-sizing: border-box;
         }
 
-        /* ----- Progress Bar & Combo ----- */
+        /* ----- Progress Bar & Combo Style ปรับใหม่ ----- */
         .progress-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 6px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-weight: 600;
             font-size: 0.95rem;
+            color: #64748b;
         }
 
         .progress-container {
             width: 100%;
-            height: 16px;
-            background: #e5e7eb;
+            height: 14px;
+            background: #e2e8f0;
             border-radius: 10px;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             overflow: hidden;
             position: relative;
         }
@@ -58,47 +59,52 @@
             width: 0%;
             background: var(--primary);
             border-radius: 10px;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
         }
 
-        /* เอฟเฟกต์สีรุ้งตอนทำคอมโบ */
-        .progress-bar.rainbow {
-            background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3, #ff0000);
-            background-size: 200% 100%;
-            animation: rainbow-scroll 1.5s linear infinite;
+        /* เปลี่ยนสี Combo จากสีรุ้งเป็นโทนส้ม-ส้มแดง อบอุ่น นุ่มนวล */
+        .progress-bar.combo-active {
+            background: linear-gradient(90deg, #ff8c00, #f97316, #ef4444);
+            box-shadow: 0 0 12px rgba(249, 115, 22, 0.4);
         }
 
-        @keyframes rainbow-scroll {
-            0% { background-position: 100% 0; }
-            100% { background-position: 0 0; }
+        .combo-badge {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            min-height: 28px;
+            margin-bottom: 12px;
         }
 
         .combo-text {
-            text-align: right;
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: #ef4444;
-            min-height: 24px;
-            margin-bottom: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #ea580c;
+            background: #fff7ed;
+            border: 1px solid #ffedd5;
+            padding: 4px 12px;
+            border-radius: 20px;
             opacity: 0;
-            transition: opacity 0.2s, transform 0.2s;
+            transform: translateY(-4px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
         
         .combo-text.active {
             opacity: 1;
-            animation: bounce 0.4s ease infinite alternate;
+            transform: translateY(0);
+            animation: pulse-glow 1.2s ease-in-out infinite alternate;
         }
 
-        @keyframes bounce {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.15); }
+        @keyframes pulse-glow {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.2); }
+            100% { transform: scale(1.05); box-shadow: 0 0 8px 2px rgba(234, 88, 12, 0.2); }
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #e5e7eb;
+            border-bottom: 2px solid #f1f5f9;
             padding-bottom: 12px;
             margin-bottom: 20px;
         }
@@ -117,9 +123,9 @@
 
         .options { display: flex; flex-direction: column; gap: 10px; }
         .option-btn {
-            background: #f9fafb; border: 2px solid #e5e7eb; padding: 12px 16px;
+            background: #f9fafb; border: 2px solid #e2e8f0; padding: 12px 16px;
             border-radius: 10px; font-size: 1.1rem; text-align: left; cursor: pointer;
-            touch-action: manipulation;
+            touch-action: manipulation; transition: all 0.15s ease;
         }
         .option-btn.selected { border-color: var(--primary); background: #e0e7ff; font-weight: bold; }
 
@@ -179,7 +185,6 @@
 
 <div class="container">
     <div id="quiz-screen">
-        <!-- เกจแสดงลำดับข้อ 0 - 15 และ Combo -->
         <div class="progress-header">
             <span>ความคืบหน้า</span>
             <span id="gauge-counter">0 / 15</span>
@@ -187,11 +192,13 @@
         <div class="progress-container">
             <div id="progress-bar" class="progress-bar"></div>
         </div>
-        <div id="combo-text" class="combo-text">🔥 Combo x0!</div>
+        <div class="combo-badge">
+            <div id="combo-text" class="combo-text">⚡ Combo x0</div>
+        </div>
 
         <div class="header">
             <span class="part-badge" id="part-title">Part 1</span>
-            <span class="progress" id="progress-text">ข้อ 1 / 15</span>
+            <span class="progress" id="progress-text" style="font-weight: bold; color: var(--primary);">ข้อ 1 / 15</span>
         </div>
 
         <div class="question-box">
@@ -258,16 +265,21 @@ function playSound(type) {
     }
 }
 
+// ฟังก์ชันอ่านเสียงภาษาญี่ปุ่น (แก้ไขเพิ่มเติมเพื่อให้สะดุดน้อยลง)
 function speakJapaneseText(text) {
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const cleanText = text.replace(/[。、！!]/g, '').trim();
-        if (cleanText === '') return;
+        if (!cleanText) return;
+
         const utterance = new SpeechSynthesisUtterance(cleanText);
-        utterance.lang = 'ja-JP'; utterance.rate = 0.85;
+        utterance.lang = 'ja-JP'; 
+        utterance.rate = 0.85;
+
         const voices = window.speechSynthesis.getVoices();
         const jaVoice = voices.find(v => v.lang === 'ja-JP' || v.lang.includes('ja'));
         if (jaVoice) utterance.voice = jaVoice;
+
         window.speechSynthesis.speak(utterance);
     }
 }
@@ -331,7 +343,6 @@ function startQuiz() {
     const p4 = rawQuestions.find(q => q.sub === 'p4');
     const p5 = rawQuestions.find(q => q.sub === 'p5');
     
-    // ดึงเฉพาะ 13 ข้อธรรมดา + Part 4 + Part 5 = รวมเป็น 15 ข้อแน่นอน
     const others = rawQuestions.filter(q => q.type !== 'matching');
     const selectedOthers = shuffleArray(others).slice(0, 13);
     
@@ -360,18 +371,17 @@ function updateProgressBar() {
     const bar = document.getElementById('progress-bar');
     const comboTxt = document.getElementById('combo-text');
     
-    // อัปเดตตัวเลขเกจ 0 / 15
     document.getElementById('gauge-counter').innerText = `${currentIndex} / ${total}`;
     bar.style.width = pct + '%';
 
-    // อัปเดต Combo
+    // การแสดงผล Combo แบบปรับปรุงสีใหม่
     if (combo >= 2) {
-        bar.classList.add('rainbow');
-        comboTxt.innerText = `🔥 Combo x${combo}!`;
+        bar.classList.add('combo-active');
+        comboTxt.innerText = `⚡ Combo x${combo}`;
         comboTxt.classList.add('active');
     } else {
-        bar.classList.remove('rainbow');
-        comboTxt.innerText = `🔥 Combo x${combo}!`;
+        bar.classList.remove('combo-active');
+        comboTxt.innerText = `⚡ Combo x${combo}`;
         comboTxt.classList.remove('active');
     }
 }
@@ -414,10 +424,11 @@ function showQuestion() {
 
         shuffleArray(q.words).forEach(word => {
             const chip = document.createElement('div'); chip.className = 'word-chip'; chip.innerText = word;
+            
+            // เพิ่มการกดคลิกชิปแล้วส่งเสียงอ่านคำภาษาญี่ปุ่นออกมาทันที
             chip.onclick = () => {
                 playSound('click');
-                // อ่านเสียงภาษาญี่ปุ่นเฉพาะของคำชิปที่กด
-                speakJapaneseText(word);
+                speakJapaneseText(word); // อ่านคำสะกดภาษาญี่ปุ่นทันทีที่แตะ
 
                 if (chip.parentElement === wordPool) {
                     answerZone.appendChild(chip); userSelectedSequence.push(word);
@@ -456,7 +467,6 @@ function handleMatchSelect(el, item, q) {
     if (isAnimating || el.classList.contains('matched')) return;
     playSound('click');
 
-    // อ่านเสียงคำภาษาญี่ปุ่นเมื่อคลิก
     if (item.side === 'left' && q.sub === 'p4') speakJapaneseText(item.text);
     if (item.side === 'right' && q.sub === 'p5') speakJapaneseText(item.text);
 
@@ -522,7 +532,6 @@ function checkAnswer() {
     const feedback = document.getElementById('feedback');
     if (isCorrect) {
         playSound('correct');
-        // เมื่อเรียงประโยคหรือตอบถูก จะอ่านประโยคเต็มทันที
         if (!q.noSound) setTimeout(() => speakJapaneseText(q.ja), 50);
         if (!hasFailedThisQuestion) { score++; combo++; }
         
